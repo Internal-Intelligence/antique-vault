@@ -1,0 +1,28 @@
+# Rust / Anchor build artifacts
+target/
+**/*.rs.bk
+
+# Vendor directory (regenerate with `cargo vendor`)
+vendor/
+
+# Node
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+
+# Env files (keep .env.example templates, never real secrets)
+.env
+.env.local
+.env.*.local
+
+# Anchor
+.anchor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#0f0f0f] text-white;
+  }
+  input, select, textarea {
+    @apply bg-[#1a1a1a] border border-[#2a2a2a] text-white rounded-lg px-3 py-2 w-full
+           focus:outline-none focus:border-amber-500 transition-colors;
+  }
+  label {
+    @apply block text-sm text-gray-400 mb-1;
+  }
+}
