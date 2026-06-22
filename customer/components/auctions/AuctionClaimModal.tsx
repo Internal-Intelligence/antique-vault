@@ -117,7 +117,7 @@ export default function AuctionClaimModal({
   if (step === "done") {
     return (
       <div className="auction-modal">
-        <div className="auction-modal-inner text-center">
+        <div className="auction-modal-inner glass-panel text-center">
           <div className="text-4xl mb-4">✓</div>
           <h2 className="text-xl font-semibold mb-2">Claim complete</h2>
           <p className="text-sm text-zinc-400 mb-6">
@@ -136,10 +136,11 @@ export default function AuctionClaimModal({
 
   return (
     <div className="auction-modal" onClick={onClose}>
-      <div className="auction-modal-inner" onClick={(e) => e.stopPropagation()}>
+      <div className="auction-modal-inner glass-panel" onClick={(e) => e.stopPropagation()}>
+        <p className="mission-kicker mb-2">Warehouse ship-out</p>
         <h2 className="text-xl font-semibold mb-1">Claim your win</h2>
         <p className="text-sm text-zinc-400 mb-4">
-          {item.name} — {formatSolLamports(item.escrowedPotLamports ?? item.highestBidLamports)} SOL
+          {item.name} — {formatSolLamports(item.escrowedPotLamports ?? item.highestBidLamports)} SOL escrowed
         </p>
         {remaining > 0 ? (
           <p className="text-sm text-amber-400 mb-4">

@@ -9,15 +9,14 @@ export default function Countdown({ endTime }: { endTime: number }) {
   }, []);
 
   const remaining = Math.max(0, endTime - now);
-  if (remaining <= 0) return <span className="text-zinc-500">Ended</span>;
+  if (remaining <= 0) return <span className="auction-countdown auction-countdown--ended">Ended</span>;
 
   const h = Math.floor(remaining / 3600);
   const m = Math.floor((remaining % 3600) / 60);
   const s = remaining % 60;
-  const urgent = remaining < 3600;
 
   return (
-    <span className={urgent ? "text-amber-400 font-medium" : "text-emerald-400"}>
+    <span className="auction-countdown">
       {h > 0 ? `${h}h ` : ""}
       {m}m {s}s
     </span>

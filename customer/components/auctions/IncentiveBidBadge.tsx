@@ -10,9 +10,9 @@ export default function IncentiveBidBadge({ item }: { item: MarketplaceItem }) {
   return (
     <span
       className={`auction-badge ${botLeading ? "auction-badge--incentive-active" : "auction-badge--incentive"}`}
-      title="NFTBAY fee-funded incentive liquidity — transparent platform bids on standout vault-verified items"
+      title="NFTBAY incentive liquidity — fee-funded minimum bids on standout vault-verified listings. Transparent, never self-bidding."
     >
-      {botLeading ? "NFTBAY bid" : "Incentive eligible"}
+      {botLeading ? "NFTBAY incentive bid" : "Incentive eligible"}
     </span>
   );
 }

@@ -5660,7 +5660,186 @@ button, .quantum-card, .casino-card {
 }
 
 .auctions-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.auctions-header__row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .auctions-header__row {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+  }
+}
+
+.auctions-header__wallet-hint {
+  font-size: 13px;
+  color: rgba(251, 191, 36, 0.9);
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  background: rgba(120, 53, 15, 0.15);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.auctions-mission-band {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+}
+
+@media (min-width: 640px) {
+  .auctions-mission-band {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.auctions-mission-band__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #f4f4f5;
+  line-height: 1.35;
+}
+
+.auctions-mission-band__sub {
+  font-size: 13px;
+  color: #71717a;
+  line-height: 1.55;
+  margin-top: 6px;
+  max-width: 52ch;
+}
+
+.auctions-mission-band__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.auctions-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+@media (min-width: 640px) {
+  .auctions-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.auctions-stats__chip {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.auctions-stats__value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #34d399;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.auctions-stats__label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #71717a;
+  margin-top: 4px;
+}
+
+.auctions-incentive-strip {
+  margin-bottom: 20px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.auctions-incentive-strip__summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.auctions-incentive-strip__summary::-webkit-details-marker {
+  display: none;
+}
+
+.auctions-incentive-strip__icon {
+  font-size: 20px;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.auctions-incentive-strip__label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e4e4e7;
+}
+
+.auctions-incentive-strip__hint {
+  display: block;
+  font-size: 11px;
+  color: #71717a;
+  margin-top: 2px;
+}
+
+.auctions-incentive-strip__body {
+  padding: 0 18px 16px 50px;
+}
+
+.auctions-incentive-strip__rules {
+  list-style: disc;
+  padding-left: 1rem;
+  font-size: 12px;
+  color: #a1a1aa;
+  line-height: 1.55;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auctions-incentive-strip__pubkey {
+  margin-top: 12px;
+  font-size: 10px;
+  color: #71717a;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.auctions-incentive-strip__pubkey code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  color: #93c5fd;
+  word-break: break-all;
+}
+
+.auctions-incentive-strip__pubkey--muted {
+  font-style: italic;
 }
 
 .auctions-tabs {
@@ -5692,6 +5871,41 @@ button, .quantum-card, .casino-card {
   background: rgba(16, 185, 129, 0.12);
 }
 
+.auctions-tab__count {
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(52, 211, 153, 0.2);
+  color: #6ee7b7;
+  font-variant-numeric: tabular-nums;
+}
+
+.auctions-toast {
+  font-size: 13px;
+  color: #a1a1aa;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.auctions-loading {
+  font-size: 13px;
+  color: #71717a;
+}
+
+.auctions-footer {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+  color: #52525b;
+  line-height: 1.55;
+}
+
 .auctions-grid {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -5712,17 +5926,85 @@ button, .quantum-card, .casino-card {
 
 .auction-card {
   padding: 1.25rem;
-  border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #141414;
 }
 
 .auction-card-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 0.75rem;
   margin-bottom: 0.75rem;
+}
+
+.auction-card__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fafafa;
+  line-height: 1.3;
+}
+
+.auction-card__meta {
+  font-size: 11px;
+  color: #71717a;
+  margin-top: 2px;
+}
+
+.auction-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: flex-end;
+  max-width: 50%;
+}
+
+.auction-card-bid__label {
+  font-size: 11px;
+  color: #71717a;
+}
+
+.auction-card-bid__amount {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.125rem;
+  color: #34d399;
+  font-weight: 600;
+}
+
+.auction-card__timing {
+  font-size: 11px;
+  color: #71717a;
+  margin-bottom: 12px;
+}
+
+.auction-card__bid-row {
+  display: flex;
+  gap: 8px;
+}
+
+.auction-card__vault-note {
+  font-size: 11px;
+  color: #52525b;
+}
+
+.auction-card__fees-link {
+  display: block;
+  margin-top: 10px;
+  font-size: 10px;
+  color: #52525b;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.auction-card__fees-link:hover {
+  color: #34d399;
+}
+
+.auction-countdown {
+  color: #a1a1aa;
+  font-variant-numeric: tabular-nums;
+}
+
+.auction-countdown--ended {
+  color: #52525b;
 }
 
 .auction-badge {
@@ -5733,6 +6015,12 @@ button, .quantum-card, .casino-card {
   padding: 3px 8px;
   border-radius: 6px;
   flex-shrink: 0;
+}
+
+.auction-badge--vault {
+  color: #6ee7b7;
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  background: rgba(6, 78, 59, 0.2);
 }
 
 .auction-badge--boost {
@@ -5957,10 +6245,31 @@ button, .quantum-card, .casino-card {
 }
 
 .auctions-empty {
-  padding: 3rem 1rem;
+  padding: 2.5rem 1.5rem;
   text-align: center;
   border-radius: 1rem;
-  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.auctions-empty__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #d4d4d8;
+  margin-bottom: 8px;
+}
+
+.auctions-empty__sub {
+  font-size: 13px;
+  color: #71717a;
+  max-width: 36ch;
+  margin: 0 auto 20px;
+  line-height: 1.5;
+}
+
+.auctions-empty__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
 }
 
 .auction-modal {

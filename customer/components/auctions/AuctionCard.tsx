@@ -31,26 +31,22 @@ export default function AuctionCard({
   const endTime = pendingClaim ? item.claimDeadline ?? 0 : item.endTime;
 
   return (
-    <motion.article
-      whileHover={{ y: -2 }}
-      className="auction-card"
-    >
+    <motion.article whileHover={{ y: -2 }} className="auction-card glass-panel glass-panel--card">
       <div className="auction-card-header">
         <div>
-          <h3 className="font-semibold text-sm">{item.name}</h3>
-          <p className="text-xs text-zinc-500">
+          <h3 className="auction-card__name">{item.name}</h3>
+          <p className="auction-card__meta">
             {item.category}
             {item.relistCount ? ` · 2nd chance #${item.relistCount}` : ""}
           </p>
         </div>
-        <div className="flex flex-wrap gap-1 justify-end">
+        <div className="auction-card__badges">
+          <span className="auction-badge auction-badge--vault" title="Item in NFTBAY warehouse custody">
+            Warehouse verified
+          </span>
           <IncentiveBidBadge item={item} />
-          {item.isPromoted && (
-            <span className="auction-badge auction-badge--boost">Boosted</span>
-          )}
-          {pendingClaim && (
-            <span className="auction-badge auction-badge--claim">Awaiting claim</span>
-          )}
+          {item.isPromoted && <span className="auction-badge auction-badge--boost">Promoted</span>}
+          {pendingClaim && <span className="auction-badge auction-badge--claim">Awaiting claim</span>}
         </div>
       </div>
 
@@ -61,25 +57,23 @@ export default function AuctionCard({
       )}
 
       <div className="auction-card-bid">
-        <span className="text-zinc-500 text-xs">{pendingClaim ? "Winning bid" : "Current bid"}</span>
-        <span className="font-mono text-lg text-emerald-400">
+        <span className="auction-card-bid__label">{pendingClaim ? "Winning bid" : "Current bid"}</span>
+        <span className="auction-card-bid__amount">
           {formatSolLamports(pendingClaim ? item.escrowedPotLamports ?? currentBid : currentBid)} SOL
         </span>
       </div>
 
-      <p className="text-xs text-zinc-500 mb-3">
-        {pendingClaim ? "Claim deadline" : "Ends in"}: <Countdown endTime={endTime} />
-        {!pendingClaim && (
-          <> · Min next: {formatSolLamports(minBid, 4)} SOL</>
-        )}
+      <p className="auction-card__timing">
+        {pendingClaim ? "Claim deadline" : "Closes"}: <Countdown endTime={endTime} />
+        {!pendingClaim && <> · Min next {formatSolLamports(minBid, 4)} SOL</>}
       </p>
 
       {isWinner && onClaim ? (
         <button type="button" className="btn-primary w-full text-sm" onClick={() => onClaim(item)}>
-          Claim & enter shipping
+          Claim &amp; enter shipping
         </button>
       ) : isAuction && item.isActive ? (
-        <div className="flex gap-2">
+        <div className="auction-card__bid-row">
           <input
             type="number"
             step="0.001"
@@ -88,6 +82,7 @@ export default function AuctionCard({
             className="auction-input flex-1 text-sm"
             value={bidSol}
             onChange={(e) => setBidSol(e.target.value)}
+            aria-label={`Bid amount for ${item.name}`}
           />
           <button
             type="button"
@@ -102,14 +97,13 @@ export default function AuctionCard({
           </button>
         </div>
       ) : (
-        <p className="text-xs text-zinc-600">Vault preview — list as auction to bid on-chain.</p>
+        <p className="auction-card__vault-note">
+          Vault preview — list as an auction from your vault to bid on-chain.
+        </p>
       )}
 
-      <Link
-        href={`/sell?boost=${item.nftMint}`}
-        className="auction-boost-cta"
-      >
-        Boost this listing →
+      <Link href="/fees" className="auction-card__fees-link">
+        Sellers keep 92%+ · fee funds inventory &amp; incentive bids
       </Link>
     </motion.article>
   );

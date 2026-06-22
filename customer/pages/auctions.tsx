@@ -1,10 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import Layout from "../components/Layout";
-import AuctionCard from "../components/auctions/AuctionCard";
-import AuctionClaimModal from "../components/auctions/AuctionClaimModal";
+import {
+  AuctionCard,
+  AuctionClaimModal,
+  AuctionIncentiveStrip,
+  AuctionMissionBand,
+  AuctionStatsRow,
+} from "../components/auctions";
 import { useAuctionBid } from "../hooks/useAuctionBid";
 import { requireIdVerification } from "../lib/anchor";
+import { isIncentiveBidder, showIncentiveBadge } from "../lib/incentiveBot";
 import { loadMarketplaceItems, type MarketplaceItem } from "../lib/nftbay";
 
 type Tab = "live" | "ending" | "bids" | "won";
@@ -38,8 +45,19 @@ export default function AuctionsPage() {
   const now = Math.floor(Date.now() / 1000);
   const walletPk = wallet.publicKey?.toString();
 
+  const auctions = useMemo(() => items.filter((i) => i.listingType === 1), [items]);
+
+  const stats = useMemo(() => {
+    const live = auctions.filter((i) => i.isActive && i.endTime > now);
+    return {
+      live: live.length,
+      endingSoon: live.filter((i) => i.endTime - now < 86400).length,
+      incentiveEligible: live.filter((i) => showIncentiveBadge(i)).length,
+      botLeading: live.filter((i) => isIncentiveBidder(i.highestBidder)).length,
+    };
+  }, [auctions, now]);
+
   const filtered = useMemo(() => {
-    const auctions = items.filter((i) => i.listingType === 1);
     switch (tab) {
       case "ending":
         return auctions
@@ -60,7 +78,7 @@ export default function AuctionsPage() {
           .filter((i) => i.isActive && i.endTime > now)
           .sort((a, b) => a.endTime - b.endTime);
     }
-  }, [items, tab, walletPk, now]);
+  }, [auctions, items, tab, walletPk, now]);
 
   async function handleBid(item: MarketplaceItem, bidLamports: number) {
     requireIdVerification("auctions-bid-" + item.itemId, "place-bid");
@@ -81,9 +99,9 @@ export default function AuctionsPage() {
     }
   }
 
-  const tabs: { id: Tab; label: string }[] = [
-    { id: "live", label: "Live" },
-    { id: "ending", label: "Ending soon" },
+  const tabs: { id: Tab; label: string; count?: number }[] = [
+    { id: "live", label: "Live", count: stats.live },
+    { id: "ending", label: "Ending soon", count: stats.endingSoon },
     { id: "bids", label: "My bids" },
     { id: "won", label: "Won / claim" },
   ];
@@ -92,19 +110,27 @@ export default function AuctionsPage() {
     <Layout wide>
       <div className="auctions-page">
         <header className="auctions-header">
-          <div>
-            <h1 className="page-title">Auctions</h1>
-            <p className="page-subtitle">
-              Bid in SOL on warehouse-verified items. Fee-funded NFTBAY incentive bids may appear on standout
-              tech, jewelry, and card listings — labeled transparently. Winners have 72 hours to claim.
-            </p>
+          <p className="mission-kicker">Vault-backed auctions</p>
+          <div className="auctions-header__row">
+            <div>
+              <h1 className="page-title">Timed sales on verified inventory</h1>
+              <p className="page-subtitle max-w-2xl">
+                Bid in SOL on warehouse-custodied items. Fee-funded incentive liquidity may appear on standout
+                tech, jewelry, and card listings — always labeled. Escrow holds until settlement; winners have
+                72 hours to claim.
+              </p>
+            </div>
+            {!wallet.connected && (
+              <p className="auctions-header__wallet-hint">Connect wallet to bid or claim.</p>
+            )}
           </div>
-          {!wallet.connected && (
-            <p className="text-sm text-amber-400/90">Connect wallet to bid or claim.</p>
-          )}
         </header>
 
-        <nav className="auctions-tabs">
+        <AuctionMissionBand />
+        <AuctionStatsRow stats={stats} />
+        <AuctionIncentiveStrip />
+
+        <nav className="auctions-tabs" aria-label="Auction views">
           {tabs.map((t) => (
             <button
               key={t.id}
@@ -113,24 +139,40 @@ export default function AuctionsPage() {
               onClick={() => setTab(t.id)}
             >
               {t.label}
+              {t.count != null && t.count > 0 && (
+                <span className="auctions-tab__count">{t.count}</span>
+              )}
             </button>
           ))}
         </nav>
 
         {toast && (
-          <p className="text-sm text-zinc-400 mb-4" role="status">
+          <p className="auctions-toast" role="status">
             {toast}
           </p>
         )}
 
         {loading ? (
-          <p className="text-zinc-500 text-sm">Loading auctions…</p>
+          <p className="auctions-loading">Loading auctions…</p>
         ) : filtered.length === 0 ? (
-          <div className="auctions-empty">
-            <p className="text-zinc-400 mb-2">No auctions in this view yet.</p>
-            <p className="text-sm text-zinc-600">
-              List an item as an auction from Sell, or check back when devnet listings are live.
+          <div className="auctions-empty glass-panel glass-panel--subtle">
+            <p className="auctions-empty__title">No auctions in this view yet</p>
+            <p className="auctions-empty__sub">
+              {tab === "bids" || tab === "won"
+                ? "Your bids and wins will show here once you participate."
+                : "List from your vault after warehouse intake — or check back when devnet listings are live."}
             </p>
+            <div className="auctions-empty__actions">
+              <Link href="/sell" className="btn-primary text-sm min-h-[40px]">
+                Start selling
+              </Link>
+              <Link href="/mission" className="btn-secondary text-sm min-h-[40px]">
+                How fees work
+              </Link>
+              <Link href="/warehouse" className="home-ghost-btn min-h-[40px]">
+                Verification hub →
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="auctions-grid">
@@ -146,6 +188,20 @@ export default function AuctionsPage() {
             ))}
           </div>
         )}
+
+        <footer className="auctions-footer">
+          <p>
+            Every auction NFT maps to a physical unit in NFTBAY custody.{" "}
+            <Link href="/fees" className="text-emerald-500/90 hover:underline">
+              Fee allocation
+            </Link>{" "}
+            funds inventory and incentive bids — see{" "}
+            <Link href="/mission" className="text-emerald-500/90 hover:underline">
+              mission
+            </Link>
+            .
+          </p>
+        </footer>
       </div>
 
       {claimItem && (
