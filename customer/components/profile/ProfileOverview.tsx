@@ -102,7 +102,7 @@ export default function ProfileOverview({
           <span className="profile-quick-link__label">Browse market</span>
           <span className="profile-quick-link__arrow">→</span>
         </Link>
-        <Link href="/" className="profile-quick-link">
+        <Link href="/profile?tab=inventory" className="profile-quick-link">
           <span className="profile-quick-link__label">My inventory</span>
           <span className="profile-quick-link__arrow">→</span>
         </Link>

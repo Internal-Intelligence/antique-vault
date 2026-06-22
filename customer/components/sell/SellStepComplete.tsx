@@ -45,7 +45,7 @@ export default function SellStepComplete({ tracking, valuation, form, onReset }:
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
-        <Link href="/" className="btn-secondary">View portfolio</Link>
+        <Link href="/profile?tab=inventory" className="btn-secondary">View inventory</Link>
         <Link href="/market" className="btn-secondary">Browse market</Link>
         <button type="button" onClick={onReset} className="btn-primary">
           Sell another device

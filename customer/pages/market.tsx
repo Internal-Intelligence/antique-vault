@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { useRouter } from "next/router";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import { motion } from "framer-motion";
@@ -16,11 +17,18 @@ import {
 import { BN } from "@coral-xyz/anchor";
 
 export default function Marketplace() {
+  const router = useRouter();
   const { connection } = useConnection();
   const wallet = useWallet();
   const [listings, setListings] = useState<MarketplaceItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    const q = router.query.q;
+    if (typeof q === "string" && q.trim()) setSearch(q.trim());
+  }, [router.isReady, router.query.q]);
   const [filter, setFilter] = useState<number | null>(null);
   const [bids, setBids] = useState<Record<string, number>>({});
   const [auctionBidding, setAuctionBidding] = useState<string | null>(null);

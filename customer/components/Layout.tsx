@@ -12,7 +12,7 @@ const NAV = [
   { href: "/profile", label: "Profile" },
 ];
 
-export default function Layout({ children }: { children: ReactNode }) {
+export default function Layout({ children, wide }: { children: ReactNode; wide?: boolean }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -22,7 +22,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <title>NFTBAY — Marketplace for Real-World Assets</title>
         <meta
           name="description"
-          content="Buy and sell physical goods on Solana. Tokenize, list, pawn, auction, and redeem — crypto-native commerce for everyone."
+          content="NFTBAY — shop vault-backed phones, laptops, gaming & collectibles. Buy, sell, auction & pawn with instant SOL payouts. 5% fees. Built for crypto and everyone."
         />
       </Head>
       <div className="app-shell min-h-screen text-white">
@@ -77,7 +77,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           )}
         </header>
 
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">{children}</main>
+        <main className={`mx-auto px-4 sm:px-6 py-8 sm:py-12 ${wide ? "layout-main--wide" : "max-w-6xl"}`}>{children}</main>
 
         <footer className="border-t border-white/[0.06] mt-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-zinc-500">

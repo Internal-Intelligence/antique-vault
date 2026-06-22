@@ -8,7 +8,7 @@ export default function SellPageHero() {
   return (
     <div className="mb-10">
       <Link href={isEwasteMailin ? "/profile?tab=expand" : "/"} className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">
-        ← {isEwasteMailin ? "Back to profile" : "Back to portfolio"}
+        ← {isEwasteMailin ? "Back to profile" : "Back to home"}
       </Link>
       {isEwasteMailin ? (
         <>

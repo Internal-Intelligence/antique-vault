@@ -100,7 +100,7 @@ export default function ProfileInventory({
 
       <p className="profile-footnote">
         Full inventory management on your{" "}
-        <Link href="/" className="text-emerald-500/90 hover:text-emerald-400">
+        <Link href="/?action=list" className="text-emerald-500/90 hover:text-emerald-400">
           portfolio page
         </Link>
         . Actions here sync when wallet is connected.
