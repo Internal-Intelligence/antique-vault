@@ -8,12 +8,18 @@ export const PRIMARY_NAV = [
   { href: "/sell", label: "Sell", icon: "↑" },
 ] as const;
 
-export const SECONDARY_NAV = [
+/** Fund + Fees — rendered under wallet connect in the header. */
+export const HEADER_WALLET_LINKS = [
   { href: "/acquire", label: "Fund", highlight: "fund" as const },
-  { href: "/mission", label: "Mission" },
-  { href: "/warehouse", label: "Warehouse" },
   { href: "/fees", label: "Fees" },
 ] as const;
+
+export const SECONDARY_NAV = [
+  { href: "/mission", label: "Mission" },
+  { href: "/warehouse", label: "Warehouse" },
+] as const;
+
+export const ALL_SECONDARY_NAV = [...HEADER_WALLET_LINKS, ...SECONDARY_NAV] as const;
 
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href;
@@ -44,21 +50,48 @@ export function SiteNavStrip({ className = "" }: { className?: string }) {
             </Link>
           );
         })}
-        <span className="site-nav-strip__divider" aria-hidden />
-        {SECONDARY_NAV.map((item) => {
-          const active = isActive(router.pathname, item.href);
-          const isFund = "highlight" in item && item.highlight === "fund";
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`site-nav-pill site-nav-pill--secondary ${isFund ? "site-nav-pill--fund" : ""} ${active ? "site-nav-pill--active" : ""}`}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
+        {SECONDARY_NAV.length > 0 && (
+          <>
+            <span className="site-nav-strip__divider" aria-hidden />
+            {SECONDARY_NAV.map((item) => {
+              const active = isActive(router.pathname, item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`site-nav-pill site-nav-pill--secondary ${active ? "site-nav-pill--active" : ""}`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </>
+        )}
       </div>
+    </nav>
+  );
+}
+
+export function SiteHeaderWalletLinks() {
+  const router = useRouter();
+
+  return (
+    <nav className="site-header-wallet-links" aria-label="Fund and fees">
+      {HEADER_WALLET_LINKS.map((item) => {
+        const active = isActive(router.pathname, item.href);
+        const isFund = "highlight" in item && item.highlight === "fund";
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`site-header-wallet-link ${isFund ? "site-header-wallet-link--fund" : ""} ${
+              active ? "site-header-wallet-link--active" : ""
+            }`}
+          >
+            {item.label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }

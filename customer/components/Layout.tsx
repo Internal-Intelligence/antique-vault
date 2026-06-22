@@ -5,12 +5,18 @@ import { useRouter } from "next/router";
 import { WalletButton } from "./WalletButton";
 import HomeSearch from "./home/HomeSearch";
 import { BrandAvatar } from "./BrandAvatar";
-import { SiteNavStrip, SiteMobileTabBar, PRIMARY_NAV, SECONDARY_NAV } from "./SiteNav";
+import {
+  SiteNavStrip,
+  SiteMobileTabBar,
+  SiteHeaderWalletLinks,
+  PRIMARY_NAV,
+  ALL_SECONDARY_NAV,
+} from "./SiteNav";
 
 export default function Layout({ children, wide }: { children: ReactNode; wide?: boolean }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
-  const allNav = [...PRIMARY_NAV, ...SECONDARY_NAV];
+  const allNav = [...PRIMARY_NAV, ...ALL_SECONDARY_NAV];
 
   return (
     <>
@@ -24,7 +30,7 @@ export default function Layout({ children, wide }: { children: ReactNode; wide?:
       <div className="app-shell min-h-screen text-white pb-16 md:pb-0">
         <header className="site-header site-header--glass sticky top-0 z-40">
           <div className={`${wide ? "max-w-[1280px]" : "max-w-6xl"} mx-auto px-4 sm:px-6`}>
-            <div className="h-14 flex items-center justify-between gap-3">
+            <div className="site-header-top flex items-start justify-between gap-3">
               <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
                 <BrandAvatar size={34} title="NFTBAY home" className="brand-avatar--logo" />
                 <span className="brand-wordmark group-hover:text-emerald-300 transition-colors hidden sm:inline">
@@ -38,23 +44,28 @@ export default function Layout({ children, wide }: { children: ReactNode; wide?:
                 </div>
               )}
 
-              <div className="flex items-center gap-2 shrink-0">
-                <BrandAvatar
-                  size={36}
-                  href="/profile"
-                  active={router.pathname === "/profile"}
-                  title="Your NFTBAY profile"
-                  className="hidden sm:inline-flex"
-                />
-                <WalletButton />
-                <button
-                  type="button"
-                  className="md:hidden nav-menu-btn"
-                  aria-label="Menu"
-                  onClick={() => setMenuOpen((o) => !o)}
-                >
-                  {menuOpen ? "✕" : "☰"}
-                </button>
+              <div className="site-header-actions shrink-0">
+                <div className="site-header-actions__row">
+                  <BrandAvatar
+                    size={36}
+                    href="/profile"
+                    active={router.pathname === "/profile"}
+                    title="Your NFTBAY profile"
+                    className="hidden sm:inline-flex"
+                  />
+                  <div className="site-wallet-stack">
+                    <WalletButton />
+                    <SiteHeaderWalletLinks />
+                  </div>
+                  <button
+                    type="button"
+                    className="md:hidden nav-menu-btn"
+                    aria-label="Menu"
+                    onClick={() => setMenuOpen((o) => !o)}
+                  >
+                    {menuOpen ? "✕" : "☰"}
+                  </button>
+                </div>
               </div>
             </div>
 

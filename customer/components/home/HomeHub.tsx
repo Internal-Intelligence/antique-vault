@@ -79,7 +79,9 @@ export default function HomeHub() {
           transition={softTransition(0.6, 0.28)}
         >
           <p className="home-hub-core-label">Start here</p>
-          <HomeSearch large glass hub />
+          <div className="home-hub-search-wrap">
+            <HomeSearch large glass hub />
+          </div>
 
           <motion.div
             className="home-bubble-grid mt-6"
