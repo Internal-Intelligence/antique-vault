@@ -95,7 +95,8 @@ export default function AuctionsPage() {
           <div>
             <h1 className="page-title">Auctions</h1>
             <p className="page-subtitle">
-              Bid in SOL on vault-backed items. Winners have 72 hours to claim and enter shipping.
+              Bid in SOL on warehouse-verified items. Fee-funded NFTBAY incentive bids may appear on standout
+              tech, jewelry, and card listings — labeled transparently. Winners have 72 hours to claim.
             </p>
           </div>
           {!wallet.connected && (

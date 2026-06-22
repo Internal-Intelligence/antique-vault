@@ -2,6 +2,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Countdown from "./Countdown";
+import IncentiveBidBadge from "./IncentiveBidBadge";
 import {
   computeMinNextBidLamports,
   formatSolLamports,
@@ -42,12 +43,15 @@ export default function AuctionCard({
             {item.relistCount ? ` · 2nd chance #${item.relistCount}` : ""}
           </p>
         </div>
-        {item.isPromoted && (
-          <span className="auction-badge auction-badge--boost">Boosted</span>
-        )}
-        {pendingClaim && (
-          <span className="auction-badge auction-badge--claim">Awaiting claim</span>
-        )}
+        <div className="flex flex-wrap gap-1 justify-end">
+          <IncentiveBidBadge item={item} />
+          {item.isPromoted && (
+            <span className="auction-badge auction-badge--boost">Boosted</span>
+          )}
+          {pendingClaim && (
+            <span className="auction-badge auction-badge--claim">Awaiting claim</span>
+          )}
+        </div>
       </div>
 
       {item.image && (

@@ -1,5 +1,6 @@
 import Layout from "../components/Layout";
 import Link from "next/link";
+import { FEE_ALLOCATION } from "../lib/mission";
 
 const FEE_ROWS = [
   { name: "Standard sale", rate: "5%", note: "Applied when your item sells at fixed price or auction" },
@@ -15,7 +16,8 @@ export default function FeesPage() {
       <div className="max-w-2xl">
         <h1 className="page-title">Fees & pricing</h1>
         <p className="page-subtitle mb-8">
-          Transparent marketplace fees — competitive with eBay. You keep the majority of every sale.
+          Transparent marketplace fees — you keep the majority of every sale. Fees recycle into inventory,
+          incentive bids, and warehouse verification.
         </p>
 
         <div className="rounded-xl border border-white/[0.08] overflow-hidden mb-8">
@@ -40,10 +42,37 @@ export default function FeesPage() {
           </table>
         </div>
 
+        <section className="glass-panel glass-panel--subtle p-5 mb-8">
+          <h2 className="text-base font-semibold text-zinc-100 mb-1">Where fees go</h2>
+          <p className="text-sm text-zinc-500 mb-5 leading-relaxed">
+            On-chain settlement collects platform fees. The allocation below is how NFTBAY reinvests them —
+            deflationary deals through vault inventory, plus transparent incentive bids on standout listings.
+          </p>
+          <ul className="space-y-3">
+            {FEE_ALLOCATION.map((row) => (
+              <li key={row.label} className="flex gap-3 text-sm">
+                <span className="text-lg shrink-0" aria-hidden>
+                  {row.icon}
+                </span>
+                <div>
+                  <span className="font-medium text-zinc-200">
+                    {row.pct}% · {row.label}
+                  </span>
+                  <p className="text-xs text-zinc-500 mt-0.5 leading-relaxed">{row.desc}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <Link href="/mission" className="text-sm text-emerald-500/90 hover:underline mt-5 inline-block">
+            Read the full mission →
+          </Link>
+        </section>
+
         <div className="space-y-4 text-sm text-zinc-500 leading-relaxed">
           <p>
             <strong className="text-zinc-300">Example:</strong> You sell a phone for $200. At 5% standard fee, NFTBAY
-            collects $10 and you receive $190. Promoted listings use an 8% fee in exchange for higher visibility.
+            collects $10 and you receive $190. A portion of that $10 funds vault acquisitions and the incentive bid
+            pool that supports real demand on quality tech, jewelry, and card listings.
           </p>
           <p>
             Fees are enforced on-chain at settlement. Boost packages are optional and billed separately when you choose
@@ -51,9 +80,12 @@ export default function FeesPage() {
           </p>
         </div>
 
-        <div className="mt-10 flex gap-3">
+        <div className="mt-10 flex flex-wrap gap-3">
           <Link href="/sell" className="btn-primary">
             Start selling
+          </Link>
+          <Link href="/warehouse" className="btn-secondary">
+            Verification hub
           </Link>
           <Link href="/market" className="btn-secondary">
             Browse market

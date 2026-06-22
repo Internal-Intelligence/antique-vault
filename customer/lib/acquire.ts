@@ -100,7 +100,7 @@ export const FUND_STATS = [
   { label: "Min. unit", value: "0.05 SOL", detail: "Entry-level participation" },
   { label: "Your edge", value: "First pick", detail: "Priority when items mint" },
   { label: "On-chain", value: "UNIT tokens", detail: "Provable vault stake" },
-  { label: "Loop", value: "Fees → fuel", detail: "Marketplace feeds inventory" },
+  { label: "Loop", value: "Fees → fuel", detail: "Inventory + incentive bids" },
 ];
 
 export const FUND_STEPS: FundStep[] = [

@@ -32,8 +32,8 @@ export default function HomeCustodyStrip() {
               Real items, clear ownership — no mystery boxes, no rush to bid.
             </p>
           </div>
-          <Link href="/fees" className="home-link-arrow shrink-0 hidden sm:inline-flex">
-            Fees &amp; escrow
+          <Link href="/warehouse" className="home-link-arrow shrink-0 hidden sm:inline-flex">
+            Verification hub
           </Link>
         </div>
 

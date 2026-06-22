@@ -4315,6 +4315,167 @@ button, .quantum-card, .casino-card {
   background: rgba(251, 191, 36, 0.1);
 }
 
+.auction-badge--incentive {
+  color: #a1a1aa;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.auction-badge--incentive-active {
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* ── Mission & warehouse pages ── */
+.mission-kicker {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #34d399;
+  margin-bottom: 8px;
+}
+
+.mission-section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #f4f4f5;
+}
+
+.mission-section-sub {
+  font-size: 0.875rem;
+  color: #71717a;
+  line-height: 1.55;
+}
+
+.mission-section {
+  padding: 0;
+}
+
+.mission-section.glass-panel {
+  padding: 22px 24px;
+  border-radius: 20px;
+}
+
+.mission-fee-row + .mission-fee-row {
+  margin-top: 16px;
+}
+
+.mission-fee-row-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.mission-fee-icon {
+  font-size: 16px;
+}
+
+.mission-fee-label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e4e4e7;
+}
+
+.mission-fee-pct {
+  font-size: 13px;
+  font-weight: 600;
+  color: #34d399;
+  font-variant-numeric: tabular-nums;
+}
+
+.mission-fee-track {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.mission-fee-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(52, 211, 153, 0.6), rgba(52, 211, 153, 0.25));
+}
+
+.mission-fee-desc {
+  font-size: 12px;
+  color: #71717a;
+  line-height: 1.45;
+}
+
+.mission-pillar {
+  padding: 18px;
+  border-radius: 16px;
+}
+
+.mission-list {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.mission-roadmap {
+  padding: 18px 20px;
+  border-radius: 16px;
+}
+
+.mission-roadmap-phase {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+}
+
+.mission-roadmap-tag {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: #a1a1aa;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.warehouse-hero {
+  padding: 22px 24px;
+  border-radius: 20px;
+}
+
+.warehouse-caps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.warehouse-trust {
+  padding: 18px 20px;
+  border-radius: 16px;
+}
+
+.home-mission-band {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 20px;
+}
+
+@media (min-width: 640px) {
+  .home-mission-band {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
 .auction-card-img-wrap {
   margin-bottom: 0.75rem;
   border-radius: 0.75rem;

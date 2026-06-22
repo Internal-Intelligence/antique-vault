@@ -27,8 +27,8 @@ export const HOME_STATS = [
 
 export const HOME_TRUST_PILLS = [
   { icon: "🔒", title: "Escrow on every sale", desc: "Funds release when the deal closes — not before." },
-  { icon: "🏦", title: "Vault-backed assets", desc: "Every NFT maps to a real item in custody." },
-  { icon: "⚡", title: "5% standard fees", desc: "Transparent pricing. No surprise checkout junk." },
+  { icon: "🏦", title: "Warehouse verification", desc: "Every item passes through the NFTBAY custody hub before it lists." },
+  { icon: "🤖", title: "Fee-funded incentives", desc: "Platform bids on standout tech, jewelry & card listings — transparent liquidity." },
   { icon: "🛡️", title: "Verified sellers", desc: "Reputation, badges, and dispute-ready records." },
 ];
 

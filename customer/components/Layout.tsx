@@ -97,6 +97,8 @@ export default function Layout({ children, wide }: { children: ReactNode; wide?:
               <Link href="/auctions" className="hover:text-amber-300/90 transition-colors">Auctions</Link>
               <Link href="/market" className="hover:text-zinc-300 transition-colors">Market</Link>
               <Link href="/sell" className="hover:text-zinc-300 transition-colors">Sell</Link>
+              <Link href="/mission" className="hover:text-zinc-300 transition-colors">Mission</Link>
+              <Link href="/warehouse" className="hover:text-zinc-300 transition-colors">Warehouse</Link>
               <Link href="/fees" className="hover:text-zinc-300 transition-colors">Fees</Link>
             </div>
           </div>

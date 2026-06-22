@@ -10,6 +10,8 @@ export const PRIMARY_NAV = [
 
 export const SECONDARY_NAV = [
   { href: "/acquire", label: "Fund", highlight: "fund" as const },
+  { href: "/mission", label: "Mission" },
+  { href: "/warehouse", label: "Warehouse" },
   { href: "/fees", label: "Fees" },
 ] as const;
 
