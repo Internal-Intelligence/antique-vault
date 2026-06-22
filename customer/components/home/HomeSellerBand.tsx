@@ -2,18 +2,18 @@ import Link from "next/link";
 
 export default function HomeSellerBand() {
   return (
-    <section className="home-seller-band mb-12">
+    <section className="home-seller-band glass-panel mb-12">
       <div className="home-seller-band-inner">
         <div className="max-w-xl">
           <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400/80 mb-2">
             Sellers win here
           </p>
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-3">
-            Turn dusty gear into on-chain income
+            That closet? It&apos;s sitting on SOL
           </h2>
           <p className="text-sm text-zinc-400 leading-relaxed mb-6">
-            AI pricing, vault custody, promoted listings, pawn offers, and affiliate boosts — keep more than
-            legacy marketplaces with fees you can actually read.
+            List in minutes, get AI pricing, vault custody, and promoted reach — then watch payouts land.
+            Keep more than legacy marketplaces. Feel good selling again.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/sell" className="btn-primary">

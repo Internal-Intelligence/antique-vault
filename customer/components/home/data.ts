@@ -19,10 +19,10 @@ export const HOME_CATEGORIES: HomeCategory[] = [
 ];
 
 export const HOME_STATS = [
-  { label: "Avg. seller keeps", value: "92%+", detail: "After standard 5% fee" },
-  { label: "Settlement", value: "Instant", detail: "SOL to your wallet" },
-  { label: "Custody", value: "Insured", detail: "Vault-backed every item" },
-  { label: "Buyers & sellers", value: "2 audiences", detail: "Crypto-native + everyone" },
+  { label: "You keep", value: "92%+", detail: "More than legacy marketplaces" },
+  { label: "Payout speed", value: "Instant", detail: "SOL lands when you win" },
+  { label: "Peace of mind", value: "Insured", detail: "Real item, real custody" },
+  { label: "Built for", value: "Everyone", detail: "Collectors, flippers & normies" },
 ];
 
 export const HOME_TRUST_PILLS = [
@@ -59,16 +59,34 @@ export const CURATED_PICKS: CuratedPick[] = [
 ];
 
 export const LIVE_ACTIVITY = [
-  { who: "alex.sol", action: "won auction", item: "RTX 4080 Founders", ago: "2m" },
-  { who: "maya.eth", action: "listed", item: "iPad Pro 12.9\"", ago: "4m" },
-  { who: "vault_ops", action: "confirmed shipment", item: "ThinkPad X1", ago: "6m" },
-  { who: "jaydan", action: "pawned", item: "PS5 Slim", ago: "9m" },
-  { who: "collector", action: "bought", item: "Leica D-Lux", ago: "11m" },
+  { who: "alex.sol", action: "just won", item: "RTX 4080 Founders", ago: "2m" },
+  { who: "maya.eth", action: "listed a steal", item: "iPad Pro 12.9\"", ago: "4m" },
+  { who: "vault_ops", action: "shipped", item: "ThinkPad X1", ago: "6m" },
+  { who: "jaydan", action: "pawned for cash", item: "PS5 Slim", ago: "9m" },
+  { who: "collector", action: "snagged", item: "Leica D-Lux", ago: "11m" },
+];
+
+export type HubBubble = {
+  id: string;
+  label: string;
+  tagline: string;
+  icon: string;
+  href: string;
+  tone: "emerald" | "amber" | "violet" | "rose" | "sky" | "cyan";
+};
+
+export const HUB_BUBBLES: HubBubble[] = [
+  { id: "deals", label: "Deals", tagline: "Score something rare", icon: "✨", href: "/market", tone: "emerald" },
+  { id: "sell", label: "Sell", tagline: "Cash out in 60 sec", icon: "💰", href: "/sell", tone: "amber" },
+  { id: "bid", label: "Bid", tagline: "Out-snipe the room", icon: "🔥", href: "/auctions", tone: "rose" },
+  { id: "pawn", label: "Pawn", tagline: "Instant liquidity", icon: "⚡", href: "/sell", tone: "violet" },
+  { id: "vault", label: "Vault", tagline: "Your inventory HQ", icon: "🏦", href: "/profile", tone: "sky" },
+  { id: "auctions", label: "Auctions", tagline: "Clock is ticking", icon: "⏱️", href: "/auctions", tone: "cyan" },
 ];
 
 export const HERO_ROTATIONS = [
-  "phones, laptops & collectibles",
-  "vault-backed goods you can trust",
-  "auctions, fixed price & instant pawn",
-  "crypto payouts without the crypto headache",
+  "Hunt phones, laptops & collectibles worth bragging about",
+  "Every item vault-backed — buy with confidence, sell with pride",
+  "Live auctions, fixed steals & instant pawn — pick your rush",
+  "SOL hits your wallet fast — crypto power, zero friction",
 ];

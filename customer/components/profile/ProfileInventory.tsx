@@ -7,7 +7,7 @@ interface ProfileInventoryProps {
   connected: boolean;
   onRefresh: () => void;
   onPawn: (item: VaultItem) => void;
-  onList: (item: VaultItem) => void;
+  onList: (item: VaultItem, mode?: "fixed" | "auction") => void;
   onRedeem: (item: VaultItem) => void;
 }
 
@@ -83,8 +83,11 @@ export default function ProfileInventory({
                 <p className="profile-inventory__value">${usd}</p>
               </div>
               <div className="profile-inventory__actions">
-                <button type="button" onClick={() => onList(item)} className="profile-action profile-action--primary">
+                <button type="button" onClick={() => onList(item, "fixed")} className="profile-action profile-action--primary">
                   List
+                </button>
+                <button type="button" onClick={() => onList(item, "auction")} className="profile-action">
+                  Auction
                 </button>
                 <button type="button" onClick={() => onPawn(item)} className="profile-action">
                   Pawn

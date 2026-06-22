@@ -4,6 +4,11 @@ export interface PawnForm {
   deviceName: string;
   category: string;
   isWorking: boolean;
+  /** User picked Working / Not Working on sell flow */
+  deviceStatusChosen: boolean;
+  /** null until answered; only when isWorking */
+  hasIssues: boolean | null;
+  issuesNote: string;
   condition: number;
   weightLbs: string;
   description: string;

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import { motion } from "framer-motion";
@@ -199,10 +200,17 @@ export default function Marketplace() {
           </div>
 
           <div id="auctions" className="mt-14 pt-10 border-t border-white/[0.06]">
-            <h2 className="text-xl font-semibold tracking-tight mb-1">Live auctions</h2>
-            <p className="text-sm text-zinc-500 mb-6">
-              Place bids on vault items. Standard marketplace fees apply at settlement.
-            </p>
+            <div className="flex items-end justify-between gap-3 mb-6">
+              <div>
+                <h2 className="text-xl font-semibold tracking-tight mb-1">Live auctions</h2>
+                <p className="text-sm text-zinc-500">
+                  Bid in SOL — winners claim shipping within 72 hours.
+                </p>
+              </div>
+              <Link href="/auctions" className="text-sm text-emerald-400 hover:text-emerald-300 shrink-0">
+                Full auctions tab →
+              </Link>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filtered
                 .filter((item) => item.listingType === 1 && !item.isVaultOnly)

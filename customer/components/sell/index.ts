@@ -1,4 +1,5 @@
 export { default as SellPageHero } from "./SellPageHero";
+export { default as SellDeviceStatus } from "./SellDeviceStatus";
 export { default as SellWorkingToggle } from "./SellWorkingToggle";
 export { default as SellFlashcards } from "./SellFlashcards";
 export { default as SellRecentlySold } from "./SellRecentlySold";

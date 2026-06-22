@@ -1,4 +1,4 @@
-import HomeHero from "./HomeHero";
+import HomeHub from "./HomeHub";
 import HomeLiveActivity from "./HomeLiveActivity";
 import HomeCategoryGrid from "./HomeCategoryGrid";
 import HomeFeaturedRow from "./HomeFeaturedRow";
@@ -11,7 +11,7 @@ import HomeYourVault from "./HomeYourVault";
 export default function HomePage() {
   return (
     <div className="home-page">
-      <HomeHero />
+      <HomeHub />
       <HomeLiveActivity />
       <HomeYourVault />
       <HomeCategoryGrid />

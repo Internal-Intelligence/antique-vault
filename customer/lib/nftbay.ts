@@ -10,7 +10,7 @@ const SYSTEM_PROGRAM = SystemProgram.programId;
 
 // NFTBAY program ID (from keypair)
 export const NFTBAY_PROGRAM_ID = new PublicKey(
-  "CCDmCxhQZCeGNP6NdB6vhAKdUECbTUtq4RK4C9zHKnYw"
+  "7owcQnhZuqspQ2nUrQGSLqKiBZVpxvFDj4ngSWkHebqj"
 );
 
 // Minimal IDL for NFTBAY (pawn + listings). Full generated after `anchor build`
@@ -60,6 +60,41 @@ export const NFTBAY_IDL = {
         { name: "systemProgram", isMut: false, isSigner: false },
       ],
       args: [],
+    },
+    {
+      name: "placeBid",
+      accounts: [
+        { name: "listing", isMut: true, isSigner: false },
+        { name: "prevBidder", isMut: true, isSigner: false },
+        { name: "bidder", isMut: true, isSigner: true },
+        { name: "systemProgram", isMut: false, isSigner: false },
+      ],
+      args: [{ name: "bidAmount", type: "u64" }],
+    },
+    {
+      name: "settleAuction",
+      accounts: [{ name: "listing", isMut: true, isSigner: false }],
+      args: [],
+    },
+    {
+      name: "claimAuctionWin",
+      accounts: [
+        { name: "listing", isMut: true, isSigner: false },
+        { name: "escrowTokenAccount", isMut: true, isSigner: false },
+        { name: "winnerNftAccount", isMut: true, isSigner: false },
+        { name: "winner", isMut: true, isSigner: true },
+        { name: "seller", isMut: true, isSigner: false },
+        { name: "feeRecipient", isMut: true, isSigner: false },
+        { name: "booster", isMut: true, isSigner: false },
+        { name: "tokenProgram", isMut: false, isSigner: false },
+        { name: "systemProgram", isMut: false, isSigner: false },
+      ],
+      args: [],
+    },
+    {
+      name: "forfeitAndRelist",
+      accounts: [{ name: "listing", isMut: true, isSigner: false }],
+      args: [{ name: "relistDurationSeconds", type: "i64" }],
     },
     // Pawn / AI quantum features
     {
@@ -176,6 +211,10 @@ export const NFTBAY_IDL = {
           { name: "boosterShareBps", type: "u16" },
           { name: "acqRoundId", type: "u32" },
           { name: "neuroScore", type: "u8" },
+          { name: "claimStatus", type: "u8" },
+          { name: "claimDeadline", type: "i64" },
+          { name: "escrowedPot", type: "u64" },
+          { name: "relistCount", type: "u8" },
         ],
       },
     },
@@ -249,6 +288,13 @@ export interface NftBayListingRecord {
   neuroScore: number;
   endTime: number;
   highestBidLamports: number;
+  highestBidder?: string;
+  buyer?: string;
+  claimStatus?: number;
+  claimDeadline?: number;
+  escrowedPotLamports?: number;
+  relistCount?: number;
+  reservePriceLamports?: number;
 }
 
 export interface VaultItemBridge {
@@ -276,7 +322,7 @@ export async function fetchNftBayListings(connection: Connection): Promise<NftBa
   try {
     const all = await program.account.listing.all();
     return all
-      .filter(({ account }: any) => account.isActive)
+      .filter(({ account }: any) => account.isActive || account.claimStatus === 1)
       .map(({ publicKey, account }: any) => ({
         listingPda: publicKey.toString(),
         nftMint: account.nftMint.toString(),
@@ -290,6 +336,13 @@ export async function fetchNftBayListings(connection: Connection): Promise<NftBa
         neuroScore: account.neuroScore,
         endTime: account.endTime.toNumber(),
         highestBidLamports: account.highestBid.toNumber(),
+        highestBidder: account.highestBidder?.toString(),
+        buyer: account.buyer?.toString(),
+        claimStatus: account.claimStatus ?? 0,
+        claimDeadline: account.claimDeadline?.toNumber?.() ?? 0,
+        escrowedPotLamports: account.escrowedPot?.toNumber?.() ?? 0,
+        relistCount: account.relistCount ?? 0,
+        reservePriceLamports: account.reservePrice?.toNumber?.() ?? 0,
       }));
   } catch (e) {
     console.warn("[NFTBAY] fetchNftBayListings failed — program may be empty on this cluster", e);
@@ -788,6 +841,19 @@ export function getListingEscrowAta(nftMint: PublicKey, listingPda: PublicKey): 
 // ═══════════════════════════════════════════════════════════════════════════
 // AUCTIONS: bidding + settle helpers. Wire to market/auctions UI.
 // ═══════════════════════════════════════════════════════════════════════════
+export const CLAIM_WINDOW_SECONDS = 72 * 3600;
+export const DEFAULT_RELIST_DURATION_SECONDS = 48 * 3600;
+export const MIN_BID_INCREMENT_BPS = 500; // 5%
+
+export function computeMinNextBidLamports(highestBid: number, reserve: number): number {
+  if (highestBid <= 0) return Math.max(reserve, 1);
+  return Math.max(Math.floor(highestBid * (1 + MIN_BID_INCREMENT_BPS / 10000)) + 1, reserve);
+}
+
+export function formatSolLamports(lamports: number, digits = 3): string {
+  return (lamports / 1e9).toFixed(digits);
+}
+
 export async function placeAuctionBid(
   program: any,
   listingPda: PublicKey,
@@ -795,39 +861,61 @@ export async function placeAuctionBid(
   bidAmount: BN,
   prevBidder?: PublicKey
 ) {
-  // QUANTUM SPEED parallel: simple ix
   return program.methods
     .placeBid(bidAmount)
     .accounts({
       listing: listingPda,
       bidder,
-      prevBidder: prevBidder || PublicKey.default,
-      systemProgram: PublicKey.default,
+      // When no prior bid, refund path is skipped on-chain; bidder is a safe placeholder.
+      prevBidder: prevBidder ?? bidder,
+      systemProgram: SYSTEM_PROGRAM,
     })
     .rpc();
 }
 
-export async function settleAuction(
+export async function settleAuction(program: any, listingPda: PublicKey) {
+  return program.methods.settleAuction().accounts({ listing: listingPda }).rpc();
+}
+
+export async function claimAuctionWin(
   program: any,
   listingPda: PublicKey,
+  nftMint: PublicKey,
+  winner: PublicKey,
   seller: PublicKey,
-  winnerNftAta: PublicKey,
-  escrowAta: PublicKey,
-  feeRecipient: PublicKey,
-  booster: PublicKey
+  feeRecipient?: PublicKey,
+  booster?: PublicKey
 ) {
+  const listing = await program.account.listing.fetch(listingPda);
+  const resolvedFeeRecipient = feeRecipient ?? getPlatformFeeRecipient() ?? seller;
+  const resolvedBooster = booster ?? new PublicKey(listing.booster);
+  const winnerNftAta = getBuyerNftAta(nftMint, winner);
+  const escrowAta = getListingEscrowAta(nftMint, listingPda);
+
   return program.methods
-    .settleAuction()
+    .claimAuctionWin()
     .accounts({
       listing: listingPda,
-      seller,
-      winnerNftAccount: winnerNftAta,
       escrowTokenAccount: escrowAta,
-      feeRecipient,
-      booster,
-      systemProgram: SYSTEM_PROGRAM,
+      winnerNftAccount: winnerNftAta,
+      winner,
+      seller,
+      feeRecipient: resolvedFeeRecipient,
+      booster: resolvedBooster,
       tokenProgram: TOKEN_PROGRAM,
+      systemProgram: SYSTEM_PROGRAM,
     })
+    .rpc();
+}
+
+export async function forfeitAndRelist(
+  program: any,
+  listingPda: PublicKey,
+  relistDurationSeconds = DEFAULT_RELIST_DURATION_SECONDS
+) {
+  return program.methods
+    .forfeitAndRelist(new BN(relistDurationSeconds))
+    .accounts({ listing: listingPda })
     .rpc();
 }
 

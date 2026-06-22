@@ -1,5 +1,6 @@
 import { CATEGORIES, CONDITIONS } from "../../lib/anchor";
 import type { PawnForm } from "../../lib/sell";
+import SellDeviceStatus from "./SellDeviceStatus";
 
 interface SellStepFormProps {
   form: PawnForm;
@@ -7,6 +8,8 @@ interface SellStepFormProps {
   updateForm: <K extends keyof PawnForm>(key: K, val: PawnForm[K]) => void;
   runQuantumAutoDetect: () => void;
   onContinue: () => void;
+  deviceStatusComplete: boolean;
+  onDeviceStatusCompleteChange: (complete: boolean) => void;
 }
 
 export default function SellStepForm({
@@ -15,9 +18,19 @@ export default function SellStepForm({
   updateForm,
   runQuantumAutoDetect,
   onContinue,
+  deviceStatusComplete,
+  onDeviceStatusCompleteChange,
 }: SellStepFormProps) {
+  const canEvaluate = deviceStatusComplete && form.deviceName.trim().length > 0;
+
   return (
     <div className="ios-flow-panel p-6 mb-6">
+      <SellDeviceStatus
+        form={form}
+        updateForm={updateForm}
+        onCompleteChange={onDeviceStatusCompleteChange}
+        compact
+      />
       <div className="flex items-center justify-between mb-4">
         <div>
           <div className="uppercase text-emerald-400 text-xs tracking-[2px] mb-1">Almost there</div>
@@ -90,12 +103,6 @@ export default function SellStepForm({
               className="w-full ios-input text-sm"
             />
           </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1.5">STATUS</label>
-            <p className="ios-input text-sm py-2.5 text-zinc-400">
-              {form.isWorking ? "Working — higher offer range" : "Non-working — parts value"}
-            </p>
-          </div>
         </div>
         <div>
           <label className="block text-xs text-gray-500 mb-1.5">DESCRIPTION</label>
@@ -112,13 +119,15 @@ export default function SellStepForm({
       <button
         type="button"
         onClick={onContinue}
-        disabled={!form.deviceName.trim()}
+        disabled={!canEvaluate}
         className="mt-6 w-full py-3.5 rounded-2xl bg-emerald-500 text-black font-bold disabled:bg-gray-800 disabled:text-gray-500 active:bg-emerald-400"
       >
         Get AI valuation →
       </button>
       <p className="text-[10px] text-center text-gray-600 mt-2">
-        Offers use condition, demand, and comparable sales. You confirm before shipping.
+        {!deviceStatusComplete
+          ? "Choose Working or Not Working above — explain any issues if needed."
+          : "Offers use condition, demand, and comparable sales. You confirm before shipping."}
       </p>
     </div>
   );

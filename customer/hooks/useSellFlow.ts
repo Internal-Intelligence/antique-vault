@@ -21,6 +21,9 @@ const DEFAULT_FORM: PawnForm = {
   deviceName: "",
   category: CATEGORIES[0],
   isWorking: true,
+  deviceStatusChosen: false,
+  hasIssues: null,
+  issuesNote: "",
   condition: 3,
   weightLbs: "2.8",
   description: "",
@@ -58,6 +61,8 @@ export interface SellFlowActions {
   onShipAddressChange: (value: string) => void;
   onChainPawnStatus: string | null;
   onChainPawnBlockers: string[];
+  deviceStatusComplete: boolean;
+  setDeviceStatusComplete: (complete: boolean) => void;
 }
 
 export type UseSellFlowReturn = SellFlowState & {
@@ -88,6 +93,7 @@ export function useSellFlow(): UseSellFlowReturn {
   const [grokRec, setGrokRec] = useState("");
   const [onChainPawnStatus, setOnChainPawnStatus] = useState<string | null>(null);
   const [onChainPawnBlockers, setOnChainPawnBlockers] = useState<string[]>([]);
+  const [deviceStatusComplete, setDeviceStatusComplete] = useState(false);
 
   const val = valuation;
 
@@ -101,7 +107,11 @@ export function useSellFlow(): UseSellFlowReturn {
         prev.description || "Mail-in e-waste bundle — phones, laptops, cables, small electronics under 15 lbs",
       weightLbs: prev.weightLbs === DEFAULT_FORM.weightLbs ? "5" : prev.weightLbs,
       isWorking: false,
+      deviceStatusChosen: true,
+      hasIssues: null,
+      issuesNote: "",
     }));
+    setDeviceStatusComplete(true);
   }, [router.isReady, router.query.program]);
 
   const updateForm = useCallback(<K extends keyof PawnForm>(key: K, val: PawnForm[K]) => {
@@ -294,6 +304,13 @@ export function useSellFlow(): UseSellFlowReturn {
   const startFlashcards = useCallback(() => {
     setPawnStep("flashcards");
     setBubbleAnswers({});
+    setDeviceStatusComplete(false);
+    setForm((prev) => ({
+      ...prev,
+      deviceStatusChosen: false,
+      hasIssues: null,
+      issuesNote: "",
+    }));
   }, []);
 
   const completeFlashcards = useCallback(() => {
@@ -306,6 +323,7 @@ export function useSellFlow(): UseSellFlowReturn {
 
   const resetAll = useCallback(() => {
     setForm(DEFAULT_FORM);
+    setDeviceStatusComplete(false);
     setBubbleAnswers({});
     setValuation(null);
     setShowVal(false);
@@ -402,5 +420,7 @@ export function useSellFlow(): UseSellFlowReturn {
     onShipAddressChange,
     onChainPawnStatus,
     onChainPawnBlockers,
+    deviceStatusComplete,
+    setDeviceStatusComplete,
   };
 }

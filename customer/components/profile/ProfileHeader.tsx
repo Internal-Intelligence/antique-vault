@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { BrandAvatar } from "../BrandAvatar";
 
 interface ProfileHeaderProps {
   level: number;
@@ -31,9 +32,13 @@ export default function ProfileHeader({
   return (
     <header className="profile-hero">
       <div className="profile-hero__main">
-        <div className="profile-avatar" aria-hidden>
-          {connected ? handle.slice(0, 2).toUpperCase() : "?"}
-        </div>
+        {connected ? (
+          <div className="profile-avatar profile-avatar--user" aria-hidden>
+            {handle.slice(0, 2).toUpperCase()}
+          </div>
+        ) : (
+          <BrandAvatar size={48} title="NFTBAY profile" className="profile-avatar--brand" />
+        )}
         <div className="min-w-0 flex-1">
           <p className="profile-hero__eyebrow">Seller dashboard</p>
           <h1 className="profile-hero__title">

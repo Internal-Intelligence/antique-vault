@@ -24,7 +24,10 @@ use anchor_spl::associated_token::AssociatedToken;
 /// GOLDEN LOOP (for first Grok+Solana pawn/eBay): pawn (antique-vault) -> list on nftbay -> sale fees/treasury/boost x% -> fund more boosts/acquisition-units -> repeat. Self-reinforcing money ticket.
 ///
 /// Existing listing signatures + PDA seeds [b"listing", seller, nft_mint] unchanged for compatibility.
-declare_id!("CCDmCxhQZCeGNP6NdB6vhAKdUECbTUtq4RK4C9zHKnYw");
+declare_id!("7owcQnhZuqspQ2nUrQGSLqKiBZVpxvFDj4ngSWkHebqj");
+
+/// Winner must claim physical item within 72 hours of auction settle.
+const CLAIM_WINDOW_SECONDS: i64 = 72 * 3600;
 
 #[program]
 pub mod nftbay {
@@ -93,6 +96,10 @@ pub mod nftbay {
         listing.buyer = Pubkey::default();
         listing.protection_expires_at = 0;
         listing.dispute_status = 0;
+        listing.claim_status = 0;
+        listing.claim_deadline = 0;
+        listing.escrowed_pot = 0;
+        listing.relist_count = 0;
         listing.bump = ctx.bumps.listing;
         // my fee and boost share
         listing.owner_fee_bps = owner_fee_bps;
@@ -244,27 +251,62 @@ pub mod nftbay {
         Ok(())
     }
 
+    /// Auction ended — winner selected, bid SOL stays in listing PDA until claim or forfeit.
     pub fn settle_auction(ctx: Context<SettleAuction>) -> Result<()> {
         let highest_bid = ctx.accounts.listing.highest_bid;
-        let is_promoted = ctx.accounts.listing.is_promoted;
-        let bump = ctx.accounts.listing.bump;
-        let seller = ctx.accounts.listing.seller;
-        let nft_mint = ctx.accounts.listing.nft_mint;
         let highest_bidder = ctx.accounts.listing.highest_bidder;
-        let owner_fee_bps = ctx.accounts.listing.owner_fee_bps;
+        let is_promoted = ctx.accounts.listing.is_promoted;
         let booster = ctx.accounts.listing.booster;
-        let booster_share_bps = ctx.accounts.listing.booster_share_bps;
         let acq_round_id = ctx.accounts.listing.acq_round_id;
         let neuro_score = ctx.accounts.listing.neuro_score;
+        let nft_mint = ctx.accounts.listing.nft_mint;
 
         require!(ctx.accounts.listing.is_active, NftBayError::ListingNotActive);
         require!(ctx.accounts.listing.listing_type == 1, NftBayError::NotAuction);
         require!(Clock::get()?.unix_timestamp >= ctx.accounts.listing.end_time, NftBayError::AuctionNotEnded);
         require!(highest_bidder != Pubkey::default(), NftBayError::NoBids);
 
-        let price_for_fee = highest_bid;
+        let listing = &mut ctx.accounts.listing;
+        let now = Clock::get()?.unix_timestamp;
+        listing.is_active = false;
+        listing.sold_at = now;
+        listing.buyer = highest_bidder;
+        listing.claim_status = 1;
+        listing.claim_deadline = now + CLAIM_WINDOW_SECONDS;
+        listing.escrowed_pot = highest_bid;
+        listing.protection_expires_at = listing.claim_deadline;
+        listing.dispute_status = 0;
 
-        let splits = compute_sale_splits(price_for_fee, owner_fee_bps, booster_share_bps, is_promoted)?;
+        emit!(AuctionSettledPendingClaim {
+            nft_mint,
+            winner: highest_bidder,
+            final_price: highest_bid,
+            claim_deadline: listing.claim_deadline,
+            escrowed_pot: highest_bid,
+            is_promoted,
+            booster,
+            acq_round_id,
+            neuro_score,
+        });
+        Ok(())
+    }
+
+    /// Winner claims within 72h: NFT released + seller/fees paid from escrowed bid.
+    pub fn claim_auction_win(ctx: Context<ClaimAuctionWin>) -> Result<()> {
+        let highest_bid = ctx.accounts.listing.highest_bid;
+        let is_promoted = ctx.accounts.listing.is_promoted;
+        let bump = ctx.accounts.listing.bump;
+        let seller = ctx.accounts.listing.seller;
+        let nft_mint = ctx.accounts.listing.nft_mint;
+        let owner_fee_bps = ctx.accounts.listing.owner_fee_bps;
+        let booster_share_bps = ctx.accounts.listing.booster_share_bps;
+        let now = Clock::get()?.unix_timestamp;
+
+        require!(ctx.accounts.listing.claim_status == 1, NftBayError::NotPendingClaim);
+        require!(now < ctx.accounts.listing.claim_deadline, NftBayError::ClaimExpired);
+        require!(ctx.accounts.winner.key() == ctx.accounts.listing.buyer, NftBayError::Unauthorized);
+
+        let splits = compute_sale_splits(highest_bid, owner_fee_bps, booster_share_bps, is_promoted)?;
         let total_platform_fee = splits.platform_fee;
         let owner_fee = splits.owner_fee;
         let booster_fee = splits.booster_fee;
@@ -273,7 +315,6 @@ pub mod nftbay {
         **ctx.accounts.listing.to_account_info().try_borrow_mut_lamports()? -= seller_proceeds;
         **ctx.accounts.seller.to_account_info().try_borrow_mut_lamports()? += seller_proceeds;
         if owner_fee > 0 {
-            // fee_recipient for my owner treasury collection
             **ctx.accounts.listing.to_account_info().try_borrow_mut_lamports()? -= owner_fee;
             **ctx.accounts.fee_recipient.to_account_info().try_borrow_mut_lamports()? += owner_fee;
         }
@@ -292,14 +333,53 @@ pub mod nftbay {
         token::transfer(CpiContext::new_with_signer(ctx.accounts.token_program.to_account_info(), cpi_accounts, signer), 1)?;
 
         let listing = &mut ctx.accounts.listing;
-        listing.is_active = false;
-        let now = Clock::get()?.unix_timestamp;
-        listing.sold_at = now;
-        listing.buyer = highest_bidder;
-        listing.protection_expires_at = now + 7 * 86400;
-        listing.dispute_status = 0;
+        listing.claim_status = 2;
+        listing.escrowed_pot = 0;
 
-        emit!(AuctionSettled { nft_mint: listing.nft_mint, winner: listing.highest_bidder, final_price: listing.highest_bid, fee: total_platform_fee, owner_fee, booster_fee, is_promoted, booster, acq_round_id, neuro_score });
+        emit!(AuctionClaimCompleted {
+            nft_mint: listing.nft_mint,
+            winner: ctx.accounts.winner.key(),
+            final_price: highest_bid,
+            fee: total_platform_fee,
+            owner_fee,
+            booster_fee,
+        });
+        Ok(())
+    }
+
+    /// After 72h without claim: relist with escrowed bid as new reserve floor.
+    pub fn forfeit_and_relist(ctx: Context<ForfeitAndRelist>, relist_duration_seconds: i64) -> Result<()> {
+        require!(relist_duration_seconds >= 3600, NftBayError::InvalidDuration);
+        let now = Clock::get()?.unix_timestamp;
+        let pot = ctx.accounts.listing.escrowed_pot;
+        let seller = ctx.accounts.listing.seller;
+        let nft_mint = ctx.accounts.listing.nft_mint;
+
+        require!(ctx.accounts.listing.claim_status == 1, NftBayError::NotPendingClaim);
+        require!(now >= ctx.accounts.listing.claim_deadline, NftBayError::ClaimWindowOpen);
+
+        let listing = &mut ctx.accounts.listing;
+        listing.claim_status = 3;
+        listing.is_active = true;
+        listing.listing_type = 1;
+        listing.end_time = now + relist_duration_seconds;
+        listing.reserve_price = pot.max(listing.reserve_price);
+        listing.highest_bid = 0;
+        listing.highest_bidder = Pubkey::default();
+        listing.buyer = Pubkey::default();
+        listing.sold_at = 0;
+        listing.claim_deadline = 0;
+        listing.protection_expires_at = 0;
+        listing.relist_count = listing.relist_count.saturating_add(1);
+
+        emit!(AuctionForfeitedRelisted {
+            nft_mint,
+            seller,
+            escrowed_pot: pot,
+            relist_count: listing.relist_count,
+            new_reserve: listing.reserve_price,
+            new_end_time: listing.end_time,
+        });
         Ok(())
     }
 
@@ -669,15 +749,29 @@ pub struct PlaceBid<'info> {
 pub struct SettleAuction<'info> {
     #[account(mut, seeds = [b"listing", listing.seller.as_ref(), listing.nft_mint.as_ref()], bump = listing.bump)]
     pub listing: Account<'info, Listing>,
+}
+
+#[derive(Accounts)]
+pub struct ClaimAuctionWin<'info> {
+    #[account(mut, seeds = [b"listing", listing.seller.as_ref(), listing.nft_mint.as_ref()], bump = listing.bump)]
+    pub listing: Account<'info, Listing>,
     #[account(mut, associated_token::mint = listing.nft_mint, associated_token::authority = listing)]
     pub escrow_token_account: Account<'info, TokenAccount>,
-    #[account(mut, constraint = winner_nft_account.mint == listing.nft_mint, constraint = winner_nft_account.owner == listing.highest_bidder)]
+    #[account(mut, constraint = winner_nft_account.mint == listing.nft_mint, constraint = winner_nft_account.owner == winner.key())]
     pub winner_nft_account: Account<'info, TokenAccount>,
-    #[account(mut)] pub seller: AccountInfo<'info>,
+    #[account(mut)] pub winner: Signer<'info>,
+    #[account(mut, constraint = seller.key() == listing.seller)]
+    pub seller: AccountInfo<'info>,
     #[account(mut)] pub fee_recipient: AccountInfo<'info>,
     #[account(mut)] pub booster: AccountInfo<'info>,
     pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct ForfeitAndRelist<'info> {
+    #[account(mut, seeds = [b"listing", listing.seller.as_ref(), listing.nft_mint.as_ref()], bump = listing.bump)]
+    pub listing: Account<'info, Listing>,
 }
 
 #[derive(Accounts)]
@@ -769,17 +863,21 @@ pub struct ResolveRwaClaim<'info> {
 
 // State
 #[account]
-pub struct Listing { /* fields same */ 
+pub struct Listing {
     pub seller: Pubkey, pub nft_mint: Pubkey, pub price: u64, pub listing_type: u8, pub end_time: i64, pub highest_bid: u64, pub highest_bidder: Pubkey, pub reserve_price: u64, pub is_active: bool, pub is_promoted: bool, pub category: String, pub sold_at: i64, pub buyer: Pubkey, pub protection_expires_at: i64, pub dispute_status: u8, pub bump: u8,
-    // New for my fee and boosting: owner (my) fee bps, booster pubkey and share bps of sold for booster
     pub owner_fee_bps: u16,
     pub booster: Pubkey,
     pub booster_share_bps: u16,
-    // Tie to acq funding loop + neuro/AI fields for boosted sales (neuro recs, predictive boost)
     pub acq_round_id: u32,
     pub neuro_score: u8,
+    /// 0=none, 1=pending_claim, 2=claimed, 3=forfeited_relisted
+    pub claim_status: u8,
+    pub claim_deadline: i64,
+    /// Bid SOL kept in listing PDA across relists ("cash in the product")
+    pub escrowed_pot: u64,
+    pub relist_count: u8,
 }
-impl Listing { pub const LEN: usize = 8 + 32 + 32 + 8 + 1 + 8 + 8 + 32 + 8 + 1 + 1 + 36 + 8 + 32 + 8 + 1 + 1 + 2 + 32 + 2 + 4 + 1; }
+impl Listing { pub const LEN: usize = 8 + 32 + 32 + 8 + 1 + 8 + 8 + 32 + 8 + 1 + 1 + 36 + 8 + 32 + 8 + 1 + 1 + 2 + 32 + 2 + 4 + 1 + 1 + 8 + 8 + 1; }
 
 #[account]
 pub struct SellerReputation { pub seller: Pubkey, pub positive_count: u32, pub total_reviews: u32, pub rating_sum: u32, pub last_feedback_ts: i64, pub bump: u8, }
@@ -800,7 +898,9 @@ impl AiPawnOffer { pub const LEN: usize = 8 + 32 + 8 + 1 + 1 + 8 + 1; }
 #[event] pub struct ListingCancelled { pub nft_mint: Pubkey, pub seller: Pubkey }
 #[event] pub struct ListingSold { pub nft_mint: Pubkey, pub seller: Pubkey, pub buyer: Pubkey, pub price: u64, pub fee: u64, pub owner_fee: u64, pub booster_fee: u64, pub booster: Pubkey, pub is_promoted: bool, pub category: String, pub acq_round_id: u32, pub neuro_score: u8 }
 #[event] pub struct BidPlaced { pub nft_mint: Pubkey, pub bidder: Pubkey, pub bid_amount: u64 }
-#[event] pub struct AuctionSettled { pub nft_mint: Pubkey, pub winner: Pubkey, pub final_price: u64, pub fee: u64, pub owner_fee: u64, pub booster_fee: u64, pub booster: Pubkey, pub is_promoted: bool, pub acq_round_id: u32, pub neuro_score: u8 }
+#[event] pub struct AuctionSettledPendingClaim { pub nft_mint: Pubkey, pub winner: Pubkey, pub final_price: u64, pub claim_deadline: i64, pub escrowed_pot: u64, pub is_promoted: bool, pub booster: Pubkey, pub acq_round_id: u32, pub neuro_score: u8 }
+#[event] pub struct AuctionClaimCompleted { pub nft_mint: Pubkey, pub winner: Pubkey, pub final_price: u64, pub fee: u64, pub owner_fee: u64, pub booster_fee: u64 }
+#[event] pub struct AuctionForfeitedRelisted { pub nft_mint: Pubkey, pub seller: Pubkey, pub escrowed_pot: u64, pub relist_count: u8, pub new_reserve: u64, pub new_end_time: i64 }
 #[event] pub struct FeedbackLeft { pub seller: Pubkey, pub is_positive: bool, pub new_positive: u32, pub new_total: u32 }
 #[event] pub struct PawnCreated { pub nft_mint: Pubkey, pub borrower: Pubkey, pub requested_pawn_amount: u64, pub ai_pawn_amount: u64, pub interest_bps: u16, pub due_timestamp: i64, pub predictive_score: u8, pub is_rwa: bool }
 #[event] pub struct PawnFunded { pub nft_mint: Pubkey, pub lender: Pubkey, pub amount: u64, pub borrower: Pubkey }
@@ -826,4 +926,5 @@ pub enum NftBayError {
     #[msg("Invalid AI offer amount")] InvalidAiOffer, #[msg("Invalid score")] InvalidScore, #[msg("Not an RWA pawn")] NotRwa, #[msg("No active physical claim")] NoPhysicalClaim,
     #[msg("Invalid fee bps (cap exceeded)")] InvalidFee, #[msg("Invalid booster (must be real for promoted)")] InvalidBooster,
     #[msg("Self-boost disallowed - anti-collusion")] SelfBoostDisallowed, #[msg("Entropy/anti-gaming gate required for boost")] EntropyRequired,
+    #[msg("No pending auction claim")] NotPendingClaim, #[msg("Claim window expired")] ClaimExpired, #[msg("Claim window still open")] ClaimWindowOpen,
 }

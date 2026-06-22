@@ -127,8 +127,8 @@ export default function Profile() {
       return {
         title: "List an item on the market",
         desc: "Your vault has assets ready. List one to start earning — 5% standard fee.",
-        href: "/?action=list",
-        cta: "List now",
+        href: "/?action=list&mode=auction",
+        cta: "Start auction",
       };
     }
     return {
@@ -223,9 +223,13 @@ export default function Profile() {
     }
   }
 
-  function handleList(item: VaultItem) {
-    router.push("/");
-    showToast(`Opening vault to list ${item.name}`);
+  function handleList(item: VaultItem, mode: "fixed" | "auction" = "fixed") {
+    router.push(`/?action=list&mint=${encodeURIComponent(item.nftMint)}&mode=${mode}`);
+    showToast(
+      mode === "auction"
+        ? `Opening auction setup for ${item.name}`
+        : `Opening listing for ${item.name}`
+    );
   }
 
   function handleRedeem(item: VaultItem) {

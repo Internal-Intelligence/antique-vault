@@ -2,7 +2,7 @@ import Layout from "../components/Layout";
 import { useSellFlow } from "../hooks/useSellFlow";
 import {
   SellPageHero,
-  SellWorkingToggle,
+  SellDeviceStatus,
   SellStepForm,
   SellStepValuation,
   SellStepShipping,
@@ -33,28 +33,35 @@ export default function SellEwaste() {
         )}
 
         {inFlashcards && (
-          <SellFlashcards
-            questions={flow.bubbleQuestions}
-            answers={flow.bubbleAnswers}
-            onAnswer={flow.answerBubble}
-            onComplete={flow.completeFlashcards}
-            onBack={flow.backToLanding}
-          />
+          <>
+            <SellDeviceStatus
+              form={flow.form}
+              updateForm={flow.updateForm}
+              onCompleteChange={flow.setDeviceStatusComplete}
+            />
+            <SellFlashcards
+              questions={flow.bubbleQuestions}
+              answers={flow.bubbleAnswers}
+              onAnswer={flow.answerBubble}
+              onComplete={flow.completeFlashcards}
+              onBack={flow.backToLanding}
+              disabled={!flow.deviceStatusComplete}
+            />
+          </>
         )}
 
         {inActiveFlow && (
           <>
             {flow.pawnStep === "form" && (
-              <>
-                <SellWorkingToggle form={flow.form} updateForm={flow.updateForm} />
-                <SellStepForm
-                  form={flow.form}
-                  autoDetectMsg={flow.autoDetectMsg}
-                  updateForm={flow.updateForm}
-                  runQuantumAutoDetect={flow.runQuantumAutoDetect}
-                  onContinue={flow.goToValuation}
-                />
-              </>
+              <SellStepForm
+                form={flow.form}
+                autoDetectMsg={flow.autoDetectMsg}
+                updateForm={flow.updateForm}
+                runQuantumAutoDetect={flow.runQuantumAutoDetect}
+                onContinue={flow.goToValuation}
+                deviceStatusComplete={flow.deviceStatusComplete}
+                onDeviceStatusCompleteChange={flow.setDeviceStatusComplete}
+              />
             )}
 
             {(flow.pawnStep === "val" || flow.showVal) && flow.valuation && (

@@ -12,10 +12,10 @@ export default function HomeAuctionStrip() {
     <section className="mb-12">
       <div className="flex items-end justify-between gap-4 mb-5 px-0.5">
         <div>
-          <h2 className="home-section-title">Live auctions ending soon</h2>
-          <p className="home-section-sub">Bid now — settlement runs on-chain with standard marketplace fees.</p>
+          <h2 className="home-section-title">Auctions heating up</h2>
+          <p className="home-section-sub">The clock's running — one bid could be your story tonight.</p>
         </div>
-        <Link href="/market#auctions" className="home-link-arrow shrink-0">
+        <Link href="/auctions" className="home-link-arrow shrink-0">
           All auctions
         </Link>
       </div>
@@ -29,7 +29,7 @@ export default function HomeAuctionStrip() {
             viewport={{ once: true }}
             transition={{ delay: i * 0.06 }}
           >
-            <Link href="/market#auctions" className="home-auction-card">
+            <Link href="/auctions" className="home-auction-card glass-panel glass-panel--card">
               <div className="flex items-start justify-between gap-2">
                 <h3 className="home-auction-name">{a.name}</h3>
                 {a.hot && <span className="home-pill home-pill--live text-[10px] py-0.5">HOT</span>}

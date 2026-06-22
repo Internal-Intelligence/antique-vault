@@ -32,10 +32,12 @@ export default function HomeYourVault() {
 
   if (!wallet.connected) {
     return (
-      <section className="home-vault-strip home-vault-strip--guest mb-10">
+      <section className="home-vault-strip home-vault-strip--guest glass-panel glass-panel--subtle mb-10">
         <div>
           <h2 className="text-lg font-semibold tracking-tight">Your vault awaits</h2>
-          <p className="text-sm text-zinc-500 mt-1">Connect a wallet to track inventory, prestige, and earnings.</p>
+          <p className="text-sm text-zinc-500 mt-1">
+            Connect a wallet to track inventory, flex achievements, and watch earnings grow.
+          </p>
         </div>
         <p className="text-xs text-zinc-600">Use the wallet button in the header ↑</p>
       </section>
@@ -46,7 +48,7 @@ export default function HomeYourVault() {
   const inVault = items.filter((i) => i.status === 0).length;
 
   return (
-    <section className="home-vault-strip mb-10">
+    <section className="home-vault-strip glass-panel glass-panel--subtle mb-10">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <p className="text-xs font-medium text-emerald-400/90 mb-1">Welcome back</p>

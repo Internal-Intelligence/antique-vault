@@ -126,6 +126,16 @@ const NftCardActions = React.memo(function NftCardActions({
           </>
         )}
       </div>
+
+      {mode === "market" && !item.isVaultOnly && onBuy && (
+        <Link
+          href={`/sell?boost=${item.nftMint}`}
+          className="nft-boost-strip"
+          onClick={(e) => e.stopPropagation()}
+        >
+          Boost this listing →
+        </Link>
+      )}
     </div>
   );
 });

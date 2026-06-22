@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" role="img" aria-label="NFTBAY">
+  <defs>
+    <linearGradient id="nftbay-ring" x1="16" y1="8" x2="112" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#34d399"/>
+      <stop offset="0.55" stop-color="#10b981"/>
+      <stop offset="1" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="nftbay-gem" x1="44" y1="36" x2="84" y2="92" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6ee7b7"/>
+      <stop offset="1" stop-color="#10b981"/>
+    </linearGradient>
+    <radialGradient id="nftbay-glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(64 64) rotate(90) scale(58)">
+      <stop stop-color="#10b981" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#09090b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0c0c0e"/>
+  <circle cx="64" cy="64" r="62" fill="url(#nftbay-glow)"/>
+  <circle cx="64" cy="64" r="58" stroke="url(#nftbay-ring)" stroke-width="4"/>
+  <path fill="url(#nftbay-gem)" d="M64 34 88 64 64 94 40 64z"/>
+  <path fill="#ecfdf5" fill-opacity="0.9" d="M64 42 76 64 64 86 52 64z"/>
+  <circle cx="64" cy="64" r="58" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+</svg>

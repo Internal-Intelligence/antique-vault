@@ -7,13 +7,13 @@ export default function HomeHowItWorks() {
       <div className="text-center mb-8">
         <h2 className="home-section-title">How NFTBAY works</h2>
         <p className="home-section-sub mx-auto max-w-lg">
-          Four steps from closet clutter to SOL in your wallet — or a verified item shipped to your door.
+          Four steps from &ldquo;I should sell this&rdquo; to SOL in your wallet — or a verified treasure at your door.
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {HOME_HOW_IT_WORKS.map((step) => (
-          <div key={step.step} className="home-step-card">
+          <div key={step.step} className="home-step-card glass-panel glass-panel--subtle">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-xl">{step.icon}</span>
               <span className="text-[11px] font-mono text-emerald-500/80">{step.step}</span>

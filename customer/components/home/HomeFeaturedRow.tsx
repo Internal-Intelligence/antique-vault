@@ -58,11 +58,11 @@ export default function HomeFeaturedRow() {
     <section className="mb-12">
       <div className="flex items-end justify-between gap-4 mb-5 px-0.5">
         <div>
-          <h2 className="home-section-title">Today&apos;s picks for you</h2>
+          <h2 className="home-section-title">Picked for your next obsession</h2>
           <p className="home-section-sub">
             {showCurated
-              ? "Curated deals while listings go live — prices update when sellers list on-chain."
-              : "Fresh from the marketplace and vault bridge."}
+              ? "Hand-selected steals while listings go live — the good stuff disappears fast."
+              : "Fresh drops from the marketplace — someone's about to beat you to these."}
           </p>
         </div>
         <Link href="/market" className="home-link-arrow shrink-0">
@@ -86,7 +86,7 @@ export default function HomeFeaturedRow() {
               viewport={{ once: true }}
               transition={{ delay: i * 0.05 }}
             >
-              <Link href={deal.href} className="home-deal-card group">
+              <Link href={deal.href} className="home-deal-card glass-panel glass-panel--card group">
                 <div className="home-deal-visual">
                   <span className="home-deal-emoji" aria-hidden>
                     {deal.category.includes("Phone") ? "📱" : deal.category.includes("Laptop") ? "💻" : deal.category.includes("Game") ? "🎮" : "✨"}

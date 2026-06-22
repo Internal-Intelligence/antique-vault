@@ -8,9 +8,10 @@ type Props = {
   onAnswer: (qKey: string, opt: string, onSelect: (v: string) => void) => void;
   onComplete: () => void;
   onBack: () => void;
+  disabled?: boolean;
 };
 
-export default function SellFlashcards({ questions, answers, onAnswer, onComplete, onBack }: Props) {
+export default function SellFlashcards({ questions, answers, onAnswer, onComplete, onBack, disabled }: Props) {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
 
@@ -43,7 +44,7 @@ export default function SellFlashcards({ questions, answers, onAnswer, onComplet
   if (!current) return null;
 
   return (
-    <div className="sell-flashcards mb-8">
+    <div className={`sell-flashcards mb-8 ${disabled ? "sell-flashcards--disabled" : ""}`}>
       <div className="flex items-center justify-between mb-4 px-0.5">
         <button type="button" onClick={goPrev} className="text-sm text-zinc-500 hover:text-zinc-300">
           ← Back
@@ -70,7 +71,11 @@ export default function SellFlashcards({ questions, answers, onAnswer, onComplet
           >
             <p className="sell-flash-kicker">Quick question</p>
             <h2 className="sell-flash-question">{current.q}</h2>
-            <p className="sell-flash-hint">Tap an answer — we&apos;ll price your item from here.</p>
+            <p className="sell-flash-hint">
+              {disabled
+                ? "Finish Working / Not Working above first."
+                : "Tap an answer — we'll price your item from here."}
+            </p>
 
             <div className="sell-flash-options">
               {current.options.map((opt) => {
@@ -80,6 +85,7 @@ export default function SellFlashcards({ questions, answers, onAnswer, onComplet
                     key={opt}
                     type="button"
                     onClick={() => pick(opt)}
+                    disabled={disabled}
                     className={`sell-flash-option ${active ? "sell-flash-option--active" : ""}`}
                   >
                     {opt}
