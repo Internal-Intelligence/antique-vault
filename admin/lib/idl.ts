@@ -1,6 +1,6 @@
 export const IDL = {
   address: "FnYhRhWkpALRFhm59FSmUeEaCRLvtQCXV2PVL5Hiz3WL",
-  version: "0.1.0",
+  version: "0.2.0",
   name: "antique_vault",
   instructions: [
     {
@@ -41,6 +41,15 @@ export const IDL = {
         { name: "shippingAddress", type: "string" },
       ],
     },
+    // Agent 12 E-Waste Trust Layers
+    { name: "depositEnhancedEscrow", accounts: [{ name: "item", isMut: true, isSigner: false }, { name: "depositor", isMut: true, isSigner: true }, { name: "systemProgram", isMut: false, isSigner: false }], args: [{ name: "itemId", type: "string" }, { name: "amountLamports", type: "u64" }] },
+    { name: "verifyPaperwork", accounts: [{ name: "vault", isMut: true, isSigner: false }, { name: "item", isMut: true, isSigner: false }, { name: "authority", isMut: true, isSigner: true }], args: [{ name: "itemId", type: "string" }, { name: "paperworkHash", type: "bytes" }] },
+    { name: "submitShippingProof", accounts: [{ name: "item", isMut: true, isSigner: false }, { name: "submitter", isMut: false, isSigner: true }], args: [{ name: "itemId", type: "string" }, { name: "proof", type: "string" }] },
+    { name: "pawnItem", accounts: [{ name: "item", isMut: true, isSigner: false }, { name: "lender", isMut: true, isSigner: true }], args: [{ name: "itemId", type: "string" }, { name: "loanAmountLamports", type: "u64" }, { name: "durationSeconds", type: "i64" }] },
+    { name: "claimPawned", accounts: [{ name: "item", isMut: true, isSigner: false }, { name: "claimant", isMut: true, isSigner: true }, { name: "itemOwner", isMut: false, isSigner: false }], args: [{ name: "itemId", type: "string" }, { name: "repayOrForfeit", type: "bool" }] },
+    { name: "submitSecureAiOffer", accounts: [{ name: "item", isMut: true, isSigner: false }, { name: "submitter", isMut: true, isSigner: true }], args: [{ name: "itemId", type: "string" }, { name: "aiOfferValueCents", type: "u64" }, { name: "aiOfferHash", type: "bytes" }] },
+    { name: "acceptAiOffer", accounts: [{ name: "item", isMut: true, isSigner: false }, { name: "acceptor", isMut: false, isSigner: true }], args: [{ name: "itemId", type: "string" }] },
+    { name: "fastVerifyTrustChain", accounts: [{ name: "item", isMut: true, isSigner: false }, { name: "verifier", isMut: false, isSigner: true }], args: [{ name: "itemId", type: "string" }] },
   ],
   accounts: [
     {
@@ -71,6 +80,20 @@ export const IDL = {
           { name: "shippingAddress", type: "string" },
           { name: "category", type: "string" },
           { name: "bump", type: "u8" },
+          // E-Waste Trust Layers (Agent 12)
+          { name: "escrowAmount", type: "u64" },
+          { name: "escrowReleased", type: "bool" },
+          { name: "paperworkVerified", type: "bool" },
+          { name: "paperworkHash", type: "bytes" },
+          { name: "shippingProofHash", type: "bytes" },
+          { name: "trustChainHash", type: "bytes" },
+          { name: "isPawned", type: "bool" },
+          { name: "pawnLender", type: "publicKey" },
+          { name: "pawnAmount", type: "u64" },
+          { name: "pawnExpiry", type: "i64" },
+          { name: "aiOfferValueCents", type: "u64" },
+          { name: "aiOfferHash", type: "bytes" },
+          { name: "lastVerificationTs", type: "i64" },
         ],
       },
     },
@@ -96,6 +119,14 @@ export const IDL = {
         { name: "redeemedAt", type: "i64", index: false },
       ],
     },
+    { name: "EscrowDeposited", fields: [{ name: "itemId", type: "string", index: false }, { name: "depositor", type: "publicKey", index: false }, { name: "amountLamports", type: "u64", index: false }, { name: "newEscrowTotal", type: "u64", index: false }, { name: "trustChainHash", type: "bytes", index: false }] },
+    { name: "PaperworkVerified", fields: [{ name: "itemId", type: "string", index: false }, { name: "paperworkHash", type: "bytes", index: false }, { name: "verifiedAt", type: "i64", index: false }, { name: "trustChainHash", type: "bytes", index: false }] },
+    { name: "ShippingProofSubmitted", fields: [{ name: "itemId", type: "string", index: false }, { name: "proofHash", type: "bytes", index: false }, { name: "simulatedProofLen", type: "u16", index: false }, { name: "submittedAt", type: "i64", index: false }, { name: "trustChainHash", type: "bytes", index: false }] },
+    { name: "ItemPawned", fields: [{ name: "itemId", type: "string", index: false }, { name: "lender", type: "publicKey", index: false }, { name: "loanAmount", type: "u64", index: false }, { name: "expiry", type: "i64", index: false }, { name: "trustChainHash", type: "bytes", index: false }] },
+    { name: "PawnClaimed", fields: [{ name: "itemId", type: "string", index: false }, { name: "claimant", type: "publicKey", index: false }, { name: "repay", type: "bool", index: false }, { name: "at", type: "i64", index: false }, { name: "trustChainHash", type: "bytes", index: false }] },
+    { name: "SecureAiOfferSubmitted", fields: [{ name: "itemId", type: "string", index: false }, { name: "aiOfferValueCents", type: "u64", index: false }, { name: "aiOfferHash", type: "bytes", index: false }, { name: "submittedAt", type: "i64", index: false }, { name: "trustChainHash", type: "bytes", index: false }] },
+    { name: "AiOfferAccepted", fields: [{ name: "itemId", type: "string", index: false }, { name: "acceptedBy", type: "publicKey", index: false }, { name: "aiOfferValueCents", type: "u64", index: false }, { name: "aiOfferHash", type: "bytes", index: false }, { name: "trustChainHash", type: "bytes", index: false }] },
+    { name: "FastTrustVerified", fields: [{ name: "itemId", type: "string", index: false }, { name: "verifiedAt", type: "i64", index: false }, { name: "currentTrustHash", type: "bytes", index: false }] },
   ],
   errors: [
     { code: 6000, name: "ItemIdTooLong", msg: "Item ID must be 32 characters or less" },
@@ -106,5 +137,12 @@ export const IDL = {
     { code: 6005, name: "NotNftOwner", msg: "You do not own this NFT" },
     { code: 6006, name: "WrongNft", msg: "NFT does not match this item record" },
     { code: 6007, name: "CategoryTooLong", msg: "Category must be 32 characters or less" },
+    { code: 6008, name: "InvalidAmount", msg: "Invalid amount" },
+    { code: 6009, name: "Overflow", msg: "Arithmetic overflow" },
+    { code: 6010, name: "Unauthorized", msg: "Unauthorized action" },
+    { code: 6011, name: "AlreadyPawned", msg: "Item already pawned" },
+    { code: 6012, name: "NotPawned", msg: "Item is not pawned" },
+    { code: 6013, name: "InsufficientEscrow", msg: "Insufficient escrow for operation" },
+    { code: 6014, name: "NoAiOffer", msg: "No active AI offer for this item" },
   ],
 } as const;

@@ -8,6 +8,15 @@ import {
 import { publicKey as umiPublicKey } from "@metaplex-foundation/umi";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 
+/// ═══════════════════════════════════════════════════════════════════════════
+/// BURN + IMAGE FETCH — The Redemption Image API & Pawn Collapse
+/// 
+/// burnVaultNft: irreversible step that collapses quantum value state
+/// fetchNftImage: pulls the canonical image from the same sovereign IPFS
+///   metadata created at intake via the Image API.
+/// Used in redeem flow to prove "this exact physical device".
+/// ═══════════════════════════════════════════════════════════════════════════
+
 export async function burnVaultNft(
   wallet: WalletContextState,
   rpcEndpoint: string,

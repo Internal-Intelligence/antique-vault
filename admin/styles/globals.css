@@ -14,3 +14,23 @@
     @apply block text-sm text-gray-400 mb-1;
   }
 }
+
+/* Agent 13 Quantum Bubbles */
+.agent-bubble {
+  position: relative;
+  border-radius: 18px;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+}
+.agent-bubble:after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  width: 10px;
+  height: 10px;
+  transform: rotate(45deg);
+  background: inherit;
+  border: inherit;
+}
+.image-bubble:after { left: -4px; border-right: 0; border-bottom: 0; }
+.predictive-bubble:after { left: -4px; border-right: 0; border-bottom: 0; }
+.quantum-bubble:after { right: -4px; border-left: 0; border-top: 0; }

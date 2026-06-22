@@ -5,10 +5,12 @@ skip-lint = false
 [programs.localnet]
 antique_vault = "FnYhRhWkpALRFhm59FSmUeEaCRLvtQCXV2PVL5Hiz3WL"
 acquisition_units = "BLtdqGyjYZ7H5WjqVG2EtvY4TGxVpAqd8gBE4ZvydVHg"
+nftbay = "CCDmCxhQZCeGNP6NdB6vhAKdUECbTUtq4RK4C9zHKnYw"
 
 [programs.devnet]
 antique_vault = "FnYhRhWkpALRFhm59FSmUeEaCRLvtQCXV2PVL5Hiz3WL"
 acquisition_units = "BLtdqGyjYZ7H5WjqVG2EtvY4TGxVpAqd8gBE4ZvydVHg"
+nftbay = "CCDmCxhQZCeGNP6NdB6vhAKdUECbTUtq4RK4C9zHKnYw"
 
 [registry]
 url = "https://api.apr.dev"

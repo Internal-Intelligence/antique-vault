@@ -1,28 +1,31 @@
 import type { AppProps } from "next/app";
-import { useMemo } from "react";
-import { clusterApiUrl } from "@solana/web3.js";
-import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
-import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
-import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
-import { CoinbaseWalletAdapter } from "@solana/wallet-adapter-coinbase";
-import "@solana/wallet-adapter-react-ui/styles.css";
+import dynamic from "next/dynamic";
 import "../styles/globals.css";
 
-export default function App({ Component, pageProps }: AppProps) {
-  const endpoint = process.env.NEXT_PUBLIC_RPC_URL || clusterApiUrl("devnet");
-  const wallets = useMemo(
-    () => [new PhantomWalletAdapter(), new CoinbaseWalletAdapter(), new SolflareWalletAdapter()],
-    []
-  );
+const WalletContextProvider = dynamic(() => import("../components/WalletContextProvider"), {
+  ssr: false,
+  loading: () => (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#000",
+        color: "#30d158",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "-apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+        letterSpacing: "0.05em",
+      }}
+    >
+      Loading NFTBAY…
+    </div>
+  ),
+});
 
+export default function App({ Component, pageProps }: AppProps) {
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          <Component {...pageProps} />
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+    <WalletContextProvider>
+      <Component {...pageProps} />
+    </WalletContextProvider>
   );
 }

@@ -1,6 +1,6 @@
 export const IDL = {
   address: "FnYhRhWkpALRFhm59FSmUeEaCRLvtQCXV2PVL5Hiz3WL",
-  version: "0.1.0",
+  version: "0.2.0",
   name: "antique_vault",
   instructions: [
     {
@@ -15,6 +15,9 @@ export const IDL = {
         { name: "shippingAddress", type: "string" },
       ],
     },
+    // Agent 12 E-Waste Trust (read heavy client support)
+    { name: "acceptAiOffer", accounts: [{ name: "item", isMut: true, isSigner: false }, { name: "acceptor", isMut: false, isSigner: true }], args: [{ name: "itemId", type: "string" }] },
+    { name: "fastVerifyTrustChain", accounts: [{ name: "item", isMut: true, isSigner: false }, { name: "verifier", isMut: false, isSigner: true }], args: [{ name: "itemId", type: "string" }] },
   ],
   accounts: [
     {
@@ -45,6 +48,19 @@ export const IDL = {
           { name: "shippingAddress", type: "string" },
           { name: "category", type: "string" },
           { name: "bump", type: "u8" },
+          { name: "escrowAmount", type: "u64" },
+          { name: "escrowReleased", type: "bool" },
+          { name: "paperworkVerified", type: "bool" },
+          { name: "paperworkHash", type: "bytes" },
+          { name: "shippingProofHash", type: "bytes" },
+          { name: "trustChainHash", type: "bytes" },
+          { name: "isPawned", type: "bool" },
+          { name: "pawnLender", type: "publicKey" },
+          { name: "pawnAmount", type: "u64" },
+          { name: "pawnExpiry", type: "i64" },
+          { name: "aiOfferValueCents", type: "u64" },
+          { name: "aiOfferHash", type: "bytes" },
+          { name: "lastVerificationTs", type: "i64" },
         ],
       },
     },
@@ -58,5 +74,12 @@ export const IDL = {
     { code: 6005, name: "NotNftOwner", msg: "You do not own this NFT" },
     { code: 6006, name: "WrongNft", msg: "NFT does not match this item record" },
     { code: 6007, name: "CategoryTooLong", msg: "Category must be 32 characters or less" },
+    { code: 6008, name: "InvalidAmount", msg: "Invalid amount" },
+    { code: 6009, name: "Overflow", msg: "Arithmetic overflow" },
+    { code: 6010, name: "Unauthorized", msg: "Unauthorized action" },
+    { code: 6011, name: "AlreadyPawned", msg: "Item already pawned" },
+    { code: 6012, name: "NotPawned", msg: "Item is not pawned" },
+    { code: 6013, name: "InsufficientEscrow", msg: "Insufficient escrow for operation" },
+    { code: 6014, name: "NoAiOffer", msg: "No active AI offer for this item" },
   ],
 } as const;

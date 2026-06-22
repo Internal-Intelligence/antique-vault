@@ -6,12 +6,19 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { AnchorProvider, Program, BN } from "@coral-xyz/anchor";
+import { motion } from "framer-motion";
 import Layout from "../components/Layout";
+import { requireIdVerification } from "../lib/anchor";
+import Link from "next/link";
 
 const ACQ_PROGRAM_ID = new PublicKey(
   process.env.NEXT_PUBLIC_ACQ_PROGRAM_ID || "BLtdqGyjYZ7H5WjqVG2EtvY4TGxVpAqd8gBE4ZvydVHg"
 );
 
+// ═══════════════════════════════════════════════════════════════════════════
+// ACQUIRE — Community funds the next wave of AI-valued e-waste
+// Units give skin in the game + priority on fresh inventory
+// ═══════════════════════════════════════════════════════════════════════════
 // Minimal IDL — customer only needs buyUnits
 const IDL = {
   address: "BLtdqGyjYZ7H5WjqVG2EtvY4TGxVpAqd8gBE4ZvydVHg",
@@ -172,8 +179,7 @@ export default function AcquirePage() {
             </span>
           </h1>
           <p className="text-gray-500 leading-relaxed">
-            Fund a buying run. We source antiques, you get UNIT tokens — redeemable for
-            priority access when items are minted as NFTs. First in, first pick.
+            Fund inventory acquisition rounds. AI prices incoming RWAs. Units grant priority access when items are minted as NFTs. First in, first pick.
           </p>
         </div>
 
@@ -181,7 +187,7 @@ export default function AcquirePage() {
           <div className="grid grid-cols-3 gap-4 text-center text-sm">
             {[
               { step: "1", label: "Buy units with SOL" },
-              { step: "2", label: "We source antiques" },
+              { step: "2", label: "We source RWAs" },
               { step: "3", label: "Priority NFT access" },
             ].map(({ step, label }) => (
               <div key={step}>
@@ -267,11 +273,11 @@ export default function AcquirePage() {
                       </div>
                       <div className="flex items-end">
                         <button
-                          onClick={() => handleBuy(r)}
+                          onClick={() => { requireIdVerification("acquire-unit", "buy-acq"); handleBuy(r); }}
                           disabled={buyingId === r.roundId}
-                          className="px-4 py-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-bold rounded-lg text-sm whitespace-nowrap"
+                          className="px-4 py-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-bold rounded-lg text-sm whitespace-nowrap casino-btn"
                         >
-                          {buyingId === r.roundId ? "Buying..." : "Buy Units"}
+                          {buyingId === r.roundId ? "Buying..." : "Buy units"}
                         </button>
                       </div>
                     </div>
@@ -285,6 +291,24 @@ export default function AcquirePage() {
             })}
           </div>
         )}
+
+        <div className="casino-section mt-12 pt-8 border-t border-white/10">
+          <h2 className="text-xl font-semibold mb-1">Promote your listing</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Increase visibility with a paid listing boost. Featured placement in search results and category pages.
+          </p>
+          <div className="casino-card border border-white/10 p-6">
+            <p className="text-sm text-gray-400 mb-4">
+              Paid boosts are coming soon. List your item now and opt in when promotion is available.
+            </p>
+            <Link
+              href="/sell"
+              className="inline-flex w-full items-center justify-center py-3 bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl casino-btn transition-colors"
+            >
+              List an item →
+            </Link>
+          </div>
+        </div>
       </div>
     </Layout>
   );

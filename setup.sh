@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-echo "=== Antique Vault — Dev Setup ==="
+# ═══════════════════════════════════════════════════════════════════════════
+# Q-INTEL QUANTUM E-WASTE PLATFORM — DEV SETUP (Agent 11)
+# Prepares full stack: Rust/Anchor programs + admin + customer portals
+# AI image API (Pinata), quantum models, pawn/shipping, e-waste categories
+# ═══════════════════════════════════════════════════════════════════════════
+
+echo "=== ♻️ Q-INTEL E-Waste — Dev Setup ==="
 
 # ── 1. Rust ────────────────────────────────────────────────────────────────
 if ! command -v rustc &>/dev/null; then
@@ -89,3 +95,8 @@ echo "  4. Set NEXT_PUBLIC_PINATA_JWT=<your-jwt> in admin/.env.local"
 echo "  5. cd admin && npm install && npm run dev"
 echo ""
 echo "Admin portal will be at http://localhost:3000"
+echo ""
+echo "╔════════════════════════════════════════════════════════════╗"
+echo "║  READY FOR THE TORCH — full e-waste quantum intelligence   ║"
+echo "║  stack ready. Documented. Inspiring. Your move.            ║"
+echo "╚════════════════════════════════════════════════════════════╝"

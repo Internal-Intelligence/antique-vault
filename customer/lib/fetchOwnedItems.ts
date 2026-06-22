@@ -1,6 +1,5 @@
 import { Connection, PublicKey } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { Program } from "@coral-xyz/anchor";
 
 export interface VaultItem {
   pda: PublicKey;
@@ -12,7 +11,7 @@ export interface VaultItem {
   status: number;
   mintedAt: number;
   shippingAddress: string;
-  category: string;  // added for category metadata support
+  category: string;
 }
 
 export async function fetchOwnedVaultItems(
@@ -20,7 +19,6 @@ export async function fetchOwnedVaultItems(
   connection: Connection,
   owner: PublicKey
 ): Promise<VaultItem[]> {
-  // Single RPC call: get all token accounts where this wallet holds amount=1 (NFTs)
   const tokenAccounts = await connection.getParsedTokenAccountsByOwner(owner, {
     programId: TOKEN_PROGRAM_ID,
   });
@@ -33,7 +31,6 @@ export async function fetchOwnedVaultItems(
 
   if (ownedMints.size === 0) return [];
 
-  // Fetch all vault item records, cross-reference with owned mints
   const allRecords = await program.account.itemRecord.all();
 
   return allRecords

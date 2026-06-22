@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
-import { getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import Link from "next/link";
 import Layout from "../../components/Layout";
 import { getProgram, CONDITIONS } from "../../lib/anchor";
@@ -117,13 +117,11 @@ export default function RedeemPage() {
       const program = getProgram(wallet, connection);
       const shippingAddress = buildAddressString();
 
-      // 1. Get user's ATA for this NFT
       const nftTokenAccount = getAssociatedTokenAddressSync(
         new PublicKey(item.nftMint),
         wallet.publicKey
       );
 
-      // 2. Record redemption on-chain (stores shipping address in ItemRecord)
       setStatusMsg("Recording redemption on-chain — approve in wallet...");
       await program.methods
         .redeemItem(item.itemId, shippingAddress)
@@ -134,7 +132,6 @@ export default function RedeemPage() {
         })
         .rpc();
 
-      // 3. Burn the NFT
       setStatusMsg("Burning NFT — approve in wallet...");
       await burnVaultNft(wallet, connection.rpcEndpoint, item.nftMint);
 
@@ -154,15 +151,14 @@ export default function RedeemPage() {
       maximumFractionDigits: 0,
     });
 
-  /* ── Done ── */
   if (step === "done") {
     return (
       <Layout>
         <div className="max-w-lg mx-auto text-center py-20">
-          <div className="text-5xl mb-5">📦</div>
+          <div className="text-5xl mb-5">✓</div>
           <h1 className="text-2xl font-bold mb-3">Redemption Confirmed</h1>
           <p className="text-gray-400 mb-2">
-            Your NFT has been burned and the physical item will be shipped to:
+            NFT burned. Your item will be shipped to:
           </p>
           <div className="bg-[#141414] border border-white/5 rounded-xl p-4 text-sm text-left text-gray-300 mb-6 whitespace-pre-wrap">
             {buildAddressString()}
@@ -181,7 +177,6 @@ export default function RedeemPage() {
     );
   }
 
-  /* ── Processing ── */
   if (step === "processing") {
     return (
       <Layout>
@@ -193,7 +188,6 @@ export default function RedeemPage() {
     );
   }
 
-  /* ── Form ── */
   return (
     <Layout>
       <div className="max-w-2xl mx-auto">
@@ -201,128 +195,91 @@ export default function RedeemPage() {
           ← Back to collection
         </Link>
 
-        <h1 className="text-2xl font-bold mb-1">Redeem Physical Item</h1>
+        <h1 className="text-2xl font-bold mb-1">Redeem Item</h1>
         <p className="text-gray-500 text-sm mb-8">
-          Your NFT will be permanently burned. The physical item ships to the address below.
+          Burn your NFT and we'll ship the physical item to your address. This cannot be undone.
         </p>
 
-        {/* Item preview */}
-        {item && (
-          <div className="flex gap-4 bg-[#141414] border border-white/5 rounded-xl p-4 mb-8">
-            <div className="w-20 h-20 rounded-lg bg-[#1a1a1a] overflow-hidden flex-shrink-0">
-              {image ? (
-                <img src={image} alt={item.name} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full" />
-              )}
-            </div>
-            <div>
-              <h2 className="font-semibold text-white">{item.name}</h2>
-              <p className="text-gray-600 text-xs">{item.itemId}</p>
-              <div className="flex gap-4 mt-2 text-sm">
-                <span className="text-gray-400">
-                  {CONDITIONS[item.condition]} condition
-                </span>
-                <span className="text-amber-400 font-semibold">{valueUsd}</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-900/30 border border-red-700 text-red-300 rounded-lg px-4 py-3 mb-6 text-sm">
-            {error}
-          </div>
-        )}
-
         {!wallet.connected ? (
-          <p className="text-gray-500 text-center py-8">Connect your wallet to redeem.</p>
+          <div className="text-center py-16 text-gray-600">Connect your wallet to redeem.</div>
+        ) : !item ? (
+          error ? (
+            <div className="text-red-400 text-sm bg-red-900/20 rounded-xl p-4">{error}</div>
+          ) : (
+            <div className="flex justify-center py-16">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-amber-500" />
+            </div>
+          )
         ) : (
-          <form onSubmit={handleRedeem} className="space-y-6">
-            {/* Shipping address */}
-            <div className="bg-[#141414] border border-white/5 rounded-xl p-5 space-y-4">
-              <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">
-                Shipping Address
-              </h2>
-
-              <Input label="Full Name *" value={form.fullName} onChange={(v) => field("fullName", v)} placeholder="Jane Smith" />
-              <Input label="Address Line 1 *" value={form.line1} onChange={(v) => field("line1", v)} placeholder="123 Main Street" />
-              <Input label="Address Line 2" value={form.line2} onChange={(v) => field("line2", v)} placeholder="Apt, Suite, Unit (optional)" />
-
-              <div className="grid grid-cols-3 gap-3">
-                <div className="col-span-1">
-                  <Input label="City *" value={form.city} onChange={(v) => field("city", v)} placeholder="Austin" />
-                </div>
-                <div>
-                  <Input label="State *" value={form.state} onChange={(v) => field("state", v)} placeholder="TX" />
-                </div>
-                <div>
-                  <Input label="ZIP *" value={form.zip} onChange={(v) => field("zip", v)} placeholder="78701" />
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Item card */}
+            <div>
+              <div className="aspect-square ios-card overflow-hidden mb-4">
+                {image ? (
+                  <img src={image} alt={item.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t border-gray-700" />
+                  </div>
+                )}
               </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <Input label="Country *" value={form.country} onChange={(v) => field("country", v)} placeholder="US" />
-                <Input label="Phone (for courier)" value={form.phone} onChange={(v) => field("phone", v)} placeholder="+1 555 000 0000" />
-              </div>
+              <h2 className="font-semibold text-white mb-1">{item.name}</h2>
+              <p className="text-gray-600 text-xs mb-1">{item.itemId}</p>
+              <p className="text-amber-400 font-medium">{valueUsd}</p>
+              <p className="text-gray-500 text-xs mt-1">{CONDITIONS[item.condition]}</p>
             </div>
 
-            {/* Warning + confirmation */}
-            <div className="bg-amber-950/30 border border-amber-800/40 rounded-xl p-4 text-sm space-y-3">
-              <p className="text-amber-300 font-medium">This action cannot be undone</p>
-              <ul className="text-amber-200/70 space-y-1 list-disc list-inside">
-                <li>Your NFT will be permanently burned</li>
-                <li>The on-chain vault record will be marked redeemed</li>
-                <li>The physical item ships to the address above within 3–5 business days</li>
-              </ul>
-              <label className="flex items-center gap-3 cursor-pointer pt-1">
+            {/* Shipping form */}
+            <form onSubmit={handleRedeem} className="space-y-4">
+              {[
+                { key: "fullName", label: "Full Name", placeholder: "Jane Smith" },
+                { key: "line1", label: "Address Line 1", placeholder: "123 Main St" },
+                { key: "line2", label: "Address Line 2 (optional)", placeholder: "Apt 4B" },
+                { key: "city", label: "City", placeholder: "Austin" },
+                { key: "state", label: "State / Province", placeholder: "TX" },
+                { key: "zip", label: "ZIP / Postal Code", placeholder: "78701" },
+                { key: "country", label: "Country", placeholder: "US" },
+                { key: "phone", label: "Phone (optional)", placeholder: "+1 512 000 0000" },
+              ].map(({ key, label, placeholder }) => (
+                <div key={key}>
+                  <label className="text-xs text-gray-500 mb-1 block">{label}</label>
+                  <input
+                    type="text"
+                    value={form[key as keyof ShippingForm]}
+                    onChange={(e) => field(key as keyof ShippingForm, e.target.value)}
+                    placeholder={placeholder}
+                    required={key !== "line2" && key !== "phone"}
+                    className="w-full ios-input text-sm placeholder:text-[rgba(235,235,245,0.3)]"
+                  />
+                </div>
+              ))}
+
+              <label className="flex items-start gap-3 cursor-pointer mt-2">
                 <input
                   type="checkbox"
                   checked={confirmed}
                   onChange={(e) => setConfirmed(e.target.checked)}
-                  className="w-4 h-4 accent-amber-500"
+                  className="mt-0.5 accent-amber-500"
                 />
-                <span className="text-amber-200/80">
-                  I understand this is irreversible and my shipping address is correct
+                <span className="text-xs text-gray-500">
+                  I understand that burning this NFT is permanent and irreversible. The physical item will be shipped to the address above.
                 </span>
               </label>
-            </div>
 
-            <button
-              type="submit"
-              disabled={!confirmed || !item}
-              className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-30 disabled:cursor-not-allowed text-black font-bold rounded-xl transition-colors"
-            >
-              Confirm Redemption & Burn NFT
-            </button>
-          </form>
+              {error && (
+                <p className="text-red-400 text-xs bg-red-900/20 rounded-lg px-3 py-2">{error}</p>
+              )}
+
+              <button
+                type="submit"
+                className="w-full ios-btn ios-btn-primary disabled:opacity-40"
+              >
+                Burn NFT & Ship Item
+              </button>
+            </form>
+          </div>
         )}
       </div>
     </Layout>
-  );
-}
-
-function Input({
-  label,
-  value,
-  onChange,
-  placeholder,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-}) {
-  return (
-    <div>
-      <label className="block text-xs text-gray-500 mb-1">{label}</label>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full bg-[#0f0f0f] border border-white/8 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500/50 transition-colors placeholder:text-gray-700"
-        required={label.endsWith("*")}
-      />
-    </div>
   );
 }

@@ -1,29 +1,94 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { WalletButton } from "./WalletButton";
 
+const NAV = [
+  { href: "/sell", label: "Sell" },
+  { href: "/market", label: "Market" },
+  { href: "/acquire", label: "Fund" },
+  { href: "/fees", label: "Fees" },
+  { href: "/profile", label: "Profile" },
+];
+
 export default function Layout({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <>
       <Head>
-        <title>The Vault — Collectibles</title>
-        <meta name="description" content="Own tokenized antiques. Redeem, store, or sell." />
+        <title>NFTBAY — Marketplace for Real-World Assets</title>
+        <meta
+          name="description"
+          content="Buy and sell physical goods on Solana. Tokenize, list, pawn, auction, and redeem — crypto-native commerce for everyone."
+        />
       </Head>
-      <div className="min-h-screen bg-[#0a0a0a] text-white">
-        <nav className="border-b border-white/5 px-6 py-4 flex items-center justify-between backdrop-blur-sm sticky top-0 z-40 bg-[#0a0a0a]/90">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-amber-400 font-bold text-lg tracking-widest">THE VAULT</span>
-            <span className="text-gray-600 text-xs hidden sm:block">Tokenized Antiques</span>
-          </Link>
-          <div className="hidden sm:flex gap-6 text-sm">
-            <Link href="/market" className="text-gray-500 hover:text-white transition-colors">Market</Link>
-            <Link href="/acquire" className="text-gray-500 hover:text-white transition-colors">Acquire</Link>
-            <Link href="/" className="text-gray-500 hover:text-white transition-colors">My Items</Link>
+      <div className="app-shell min-h-screen text-white">
+        <header className="site-header sticky top-0 z-40">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+            <Link href="/" className="flex items-center gap-2.5 shrink-0">
+              <span className="brand-mark">♻</span>
+              <span className="brand-wordmark">NFTBAY</span>
+            </Link>
+
+            <nav className="hidden md:flex items-center gap-1">
+              {NAV.map((item) => {
+                const active = router.pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`nav-link ${active ? "nav-link--active" : ""}`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <div className="flex items-center gap-2">
+              <WalletButton />
+              <button
+                type="button"
+                className="md:hidden nav-menu-btn"
+                aria-label="Menu"
+                onClick={() => setMenuOpen((o) => !o)}
+              >
+                {menuOpen ? "✕" : "☰"}
+              </button>
+            </div>
           </div>
-          <WalletButton />
-        </nav>
-        <main className="max-w-5xl mx-auto px-6 py-10">{children}</main>
+
+          {menuOpen && (
+            <nav className="md:hidden border-t border-white/10 px-4 py-3 flex flex-col gap-1">
+              {NAV.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="nav-link-mobile"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          )}
+        </header>
+
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">{children}</main>
+
+        <footer className="border-t border-white/[0.06] mt-16">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-zinc-500">
+            <span>© NFTBAY — The crypto marketplace for physical goods</span>
+            <div className="flex gap-5">
+              <Link href="/market" className="hover:text-zinc-300 transition-colors">Market</Link>
+              <Link href="/sell" className="hover:text-zinc-300 transition-colors">Sell</Link>
+              <Link href="/fees" className="hover:text-zinc-300 transition-colors">Fees</Link>
+            </div>
+          </div>
+        </footer>
       </div>
     </>
   );

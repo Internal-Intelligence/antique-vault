@@ -8,6 +8,7 @@ import {
 } from "@solana/spl-token";
 import { AnchorProvider, Program, BN } from "@coral-xyz/anchor";
 import Layout from "../components/Layout";
+import Link from "next/link";
 
 const ACQ_PROGRAM_ID = new PublicKey(
   process.env.NEXT_PUBLIC_ACQ_PROGRAM_ID || "BLtdqGyjYZ7H5WjqVG2EtvY4TGxVpAqd8gBE4ZvydVHg"
@@ -186,10 +187,11 @@ export default function Rounds() {
     <Layout>
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-2xl font-bold">Acquisition Rounds</h1>
+          <h1 className="text-2xl font-bold">Acquisition Rounds <span className="text-xs align-super text-emerald-500/70">+ Quantum Funding Predictor</span></h1>
           <p className="text-gray-500 text-sm mt-1">
             Customers fund buying runs — receive UNIT tokens as proof of participation
           </p>
+          <Link href="/builders" className="text-xs text-violet-400 hover:underline">⚛️ TINKER UNIT PRICES WITH MULTI-AGENT BUILDERS</Link>
         </div>
       </div>
 

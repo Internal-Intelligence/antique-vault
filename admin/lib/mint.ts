@@ -7,6 +7,8 @@ import {
 import { generateSigner, percentAmount } from "@metaplex-foundation/umi";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 
+/// MINT — Final step of IMAGE API + AI VALUATION intake.
+/// NFT carries the quantum seed (appraised + category + isWorking metadata)
 export async function mintCollectibleNft(
   wallet: WalletContextState,
   rpcEndpoint: string,
