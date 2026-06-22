@@ -8,7 +8,6 @@ export const PRIMARY_NAV = [
   { href: "/sell", label: "Sell", icon: "↑" },
 ] as const;
 
-/** Fund + Fees — rendered under wallet connect in the header. */
 export const HEADER_WALLET_LINKS = [
   { href: "/acquire", label: "Fund", highlight: "fund" as const },
   { href: "/fees", label: "Fees" },
@@ -25,11 +24,25 @@ function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href;
 }
 
-export function SiteNavStrip({ className = "" }: { className?: string }) {
+type NavVariant = "segmented" | "scroll" | "strip";
+
+export function SiteNavStrip({
+  className = "",
+  variant = "strip",
+}: {
+  className?: string;
+  variant?: NavVariant;
+}) {
   const router = useRouter();
+  const wrapClass =
+    variant === "segmented"
+      ? "site-nav-segmented"
+      : variant === "scroll"
+        ? "site-nav-scroll"
+        : "site-nav-strip";
 
   return (
-    <nav className={`site-nav-strip ${className}`.trim()} aria-label="Main">
+    <nav className={`${wrapClass} ${className}`.trim()} aria-label="Main">
       <div className="site-nav-strip__inner">
         {PRIMARY_NAV.map((item) => {
           const active = isActive(router.pathname, item.href);
@@ -46,11 +59,11 @@ export function SiteNavStrip({ className = "" }: { className?: string }) {
               <span className="site-nav-pill__icon" aria-hidden>
                 {item.icon}
               </span>
-              {item.label}
+              <span className="site-nav-pill__label">{item.label}</span>
             </Link>
           );
         })}
-        {SECONDARY_NAV.length > 0 && (
+        {SECONDARY_NAV.length > 0 && variant !== "scroll" && (
           <>
             <span className="site-nav-strip__divider" aria-hidden />
             {SECONDARY_NAV.map((item) => {
@@ -61,7 +74,7 @@ export function SiteNavStrip({ className = "" }: { className?: string }) {
                   href={item.href}
                   className={`site-nav-pill site-nav-pill--secondary ${active ? "site-nav-pill--active" : ""}`}
                 >
-                  {item.label}
+                  <span className="site-nav-pill__label">{item.label}</span>
                 </Link>
               );
             })}
@@ -76,7 +89,7 @@ export function SiteHeaderWalletLinks() {
   const router = useRouter();
 
   return (
-    <nav className="site-header-wallet-links" aria-label="Fund and fees">
+    <nav className="ios-wallet-module__seg" aria-label="Fund and fees">
       {HEADER_WALLET_LINKS.map((item) => {
         const active = isActive(router.pathname, item.href);
         const isFund = "highlight" in item && item.highlight === "fund";
@@ -84,8 +97,8 @@ export function SiteHeaderWalletLinks() {
           <Link
             key={item.href}
             href={item.href}
-            className={`site-header-wallet-link ${isFund ? "site-header-wallet-link--fund" : ""} ${
-              active ? "site-header-wallet-link--active" : ""
+            className={`ios-wallet-module__link ${isFund ? "ios-wallet-module__link--fund" : ""} ${
+              active ? "ios-wallet-module__link--active" : ""
             }`}
           >
             {item.label}
@@ -104,11 +117,12 @@ export function SiteMobileTabBar() {
     { href: "/auctions", label: "Auctions", icon: "⏱" },
     { href: "/market", label: "Market", icon: "✦" },
     { href: "/sell", label: "Sell", icon: "↑" },
-    { href: "/profile", label: "Profile", icon: "◎" },
+    { href: "/profile", label: "Vault", icon: "◎" },
   ] as const;
 
   return (
-    <nav className="site-mobile-tabs md:hidden" aria-label="Mobile">
+    <nav className="site-mobile-tabs" aria-label="Mobile">
+      <div className="site-mobile-tabs__chrome" aria-hidden />
       {tabs.map((tab) => {
         const active = isActive(router.pathname, tab.href);
         return (

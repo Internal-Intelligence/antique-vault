@@ -36,7 +36,7 @@ export const WalletButton = dynamic(
         const addr = publicKey.toBase58();
         const short = `${addr.slice(0, 4)}…${addr.slice(-4)}`;
         return (
-          <button type="button" className="ios-wallet-btn ios-wallet-btn--connected" onClick={open}>
+          <button type="button" className="ios-wallet-btn ios-wallet-btn--connected ios-wallet-btn--module" onClick={open}>
             <PhantomIcon size={18} />
             <span className="ios-wallet-label">{short}</span>
           </button>
@@ -44,7 +44,7 @@ export const WalletButton = dynamic(
       }
 
       return (
-        <button type="button" className="ios-wallet-btn" onClick={open}>
+        <button type="button" className="ios-wallet-btn ios-wallet-btn--module" onClick={open}>
           <PhantomIcon />
           <span className="ios-wallet-label">Connect</span>
         </button>
