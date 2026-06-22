@@ -75,7 +75,7 @@ export default function SellStepShipping({
       <div className="mb-6">
         <div className="h-1.5 bg-white/10 rounded-full overflow-hidden mb-2">
           <div
-            className="h-1.5 bg-gradient-to-r from-emerald-400 to-teal-400 transition-all"
+            className="h-1.5 bg-gradient-to-r from-purple-500 to-violet-400 transition-all"
             style={{ width: `${shippingProgress}%` }}
           />
         </div>
