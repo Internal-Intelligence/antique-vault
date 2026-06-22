@@ -14,7 +14,7 @@ export default function SellStepComplete({ tracking, valuation, form, onReset }:
   const itemId = derivePreviewItemId(form);
 
   return (
-    <div className="ios-flow-panel p-8 text-center">
+    <div className="sell-glass-panel p-8 text-center">
       <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-emerald-500/15 flex items-center justify-center text-2xl">
         ✓
       </div>

@@ -1,4 +1,8 @@
+import type { SellMode } from "./sellModes";
+
 export type PawnStep = "landing" | "flashcards" | "form" | "val" | "shipping" | "complete";
+
+export type { SellMode };
 
 export interface PawnForm {
   deviceName: string;
@@ -43,6 +47,8 @@ export interface BoostPreview {
 }
 
 export interface SellFlowState {
+  sellMode: SellMode | null;
+  intakeBanner: string | null;
   form: PawnForm;
   valuation: Valuation | null;
   showVal: boolean;

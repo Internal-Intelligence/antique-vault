@@ -1,31 +1,59 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { modeLabel } from "../../lib/sell/sellModes";
+import type { SellMode } from "../../lib/sell/sellModes";
+import type { PawnStep } from "../../lib/sell";
 
-export default function SellPageHero({ compact }: { compact?: boolean }) {
+const STEP_LABELS: Partial<Record<PawnStep, string>> = {
+  flashcards: "Condition",
+  form: "Details",
+  val: "Offer",
+  shipping: "Ship",
+  complete: "Complete",
+};
+
+type Props = {
+  compact?: boolean;
+  sellMode?: SellMode | null;
+  pawnStep?: PawnStep;
+};
+
+export default function SellPageHero({ compact, sellMode, pawnStep }: Props) {
   const router = useRouter();
-  const isEwasteMailin = router.query.program === "ewaste-mailin";
+  const isEwasteMailin = router.query.program === "ewaste-mailin" || sellMode === "mailin";
 
   return (
-    <div className={compact ? "mb-6" : "mb-6"}>
-      <Link href={isEwasteMailin ? "/profile?tab=expand" : "/"} className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">
-        ← {isEwasteMailin ? "Back to profile" : "Back to home"}
+    <div className={compact ? "sell-page-hero sell-page-hero--compact" : "sell-page-hero"}>
+      <Link
+        href={isEwasteMailin ? "/profile?tab=expand" : "/"}
+        className="sell-page-hero__back"
+      >
+        ← {isEwasteMailin ? "Back to profile" : "Back to hub"}
       </Link>
-      {isEwasteMailin ? (
+
+      {isEwasteMailin && !compact ? (
         <>
-          <p className="text-xs font-medium uppercase tracking-wider text-emerald-400/90 mt-4 mb-2">Mail-in program</p>
+          <p className="sell-page-hero__kicker">Mail-in program</p>
           <h1 className="page-title">Mail e-waste, get SOL</h1>
           <p className="page-subtitle max-w-lg">
-            Ship old devices under 15 lbs. SOL is held in escrow until the vault confirms your package arrived — then paid to your wallet.
+            Ship electronics under 15 lbs. SOL stays in escrow until the warehouse confirms receipt.
           </p>
+        </>
+      ) : compact ? (
+        <>
+          <p className="sell-page-hero__kicker">{modeLabel(sellMode ?? null)}</p>
+          <h1 className="sell-page-hero__title-compact">
+            {STEP_LABELS[pawnStep ?? "landing"] ?? "Sell"}
+          </h1>
         </>
       ) : (
         <>
-          <h1 className={`${compact ? "text-2xl" : "page-title"} mt-4`}>Sell on NFTBAY</h1>
-          {!compact && (
-            <p className="page-subtitle max-w-lg">
-              Tap Sell for quick flashcards — then watch recently sold items fly while auctions go live soon.
-            </p>
-          )}
+          <p className="sell-page-hero__kicker">Vault-first selling</p>
+          <h1 className="page-title">Sell on NFTBAY</h1>
+          <p className="page-subtitle max-w-xl">
+            Ship to the verification warehouse, get an AI offer, and mint a vault-backed NFT —
+            then list, auction, or pawn on your terms.
+          </p>
         </>
       )}
     </div>

@@ -16,6 +16,7 @@ import {
   type BubbleQuestion,
   type SellFlowState,
 } from "../lib/sell";
+import type { SellMode } from "../lib/sell/sellModes";
 
 const DEFAULT_FORM: PawnForm = {
   deviceName: "",
@@ -63,6 +64,10 @@ export interface SellFlowActions {
   onChainPawnBlockers: string[];
   deviceStatusComplete: boolean;
   setDeviceStatusComplete: (complete: boolean) => void;
+  sellMode: SellMode | null;
+  intakeBanner: string | null;
+  startMode: (mode: SellMode) => void;
+  beginIntakeFromList: (mode: "list" | "auction") => void;
 }
 
 export type UseSellFlowReturn = SellFlowState & {
@@ -94,6 +99,8 @@ export function useSellFlow(): UseSellFlowReturn {
   const [onChainPawnStatus, setOnChainPawnStatus] = useState<string | null>(null);
   const [onChainPawnBlockers, setOnChainPawnBlockers] = useState<string[]>([]);
   const [deviceStatusComplete, setDeviceStatusComplete] = useState(false);
+  const [sellMode, setSellMode] = useState<SellMode | null>(null);
+  const [intakeBanner, setIntakeBanner] = useState<string | null>(null);
 
   const val = valuation;
 
@@ -313,12 +320,57 @@ export function useSellFlow(): UseSellFlowReturn {
     }));
   }, []);
 
+  const startMailin = useCallback(() => {
+    setSellMode("mailin");
+    setIntakeBanner(null);
+    setPawnStep("flashcards");
+    setBubbleAnswers({});
+    setDeviceStatusComplete(true);
+    setForm((prev) => ({
+      ...prev,
+      category: "Other E-Waste",
+      description:
+        prev.description || "Mail-in e-waste bundle — phones, laptops, cables, small electronics under 15 lbs",
+      weightLbs: prev.weightLbs === DEFAULT_FORM.weightLbs ? "5" : prev.weightLbs,
+      isWorking: false,
+      deviceStatusChosen: true,
+      hasIssues: null,
+      issuesNote: "",
+    }));
+  }, []);
+
+  const startMode = useCallback(
+    (mode: SellMode) => {
+      setSellMode(mode);
+      setIntakeBanner(null);
+      if (mode === "mailin") {
+        startMailin();
+        return;
+      }
+      if (mode === "intake" || mode === "pawn") {
+        startFlashcards();
+      }
+    },
+    [startFlashcards, startMailin]
+  );
+
+  const beginIntakeFromList = useCallback(
+    (mode: "list" | "auction") => {
+      setSellMode(mode);
+      setIntakeBanner("Ship to the warehouse first — then you can list from your vault.");
+      startFlashcards();
+    },
+    [startFlashcards]
+  );
+
   const completeFlashcards = useCallback(() => {
     setPawnStep("form");
   }, []);
 
   const backToLanding = useCallback(() => {
     setPawnStep("landing");
+    setSellMode(null);
+    setIntakeBanner(null);
   }, []);
 
   const resetAll = useCallback(() => {
@@ -327,6 +379,8 @@ export function useSellFlow(): UseSellFlowReturn {
     setBubbleAnswers({});
     setValuation(null);
     setShowVal(false);
+    setSellMode(null);
+    setIntakeBanner(null);
     setPawnStep("landing");
     setShippingProgress(0);
     setCurrentShipStep(0);
@@ -373,6 +427,10 @@ export function useSellFlow(): UseSellFlowReturn {
   }, []);
 
   return {
+    sellMode,
+    intakeBanner,
+    startMode,
+    beginIntakeFromList,
     form,
     valuation,
     showVal,

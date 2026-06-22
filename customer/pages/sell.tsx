@@ -1,5 +1,11 @@
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import Layout from "../components/Layout";
 import { useSellFlow } from "../hooks/useSellFlow";
+import ListItemModal, { type ListingMode } from "../components/listing/ListItemModal";
+import { getProgram } from "../lib/anchor";
+import { fetchOwnedVaultItems, type VaultItem } from "../lib/fetchOwnedItems";
 import {
   SellPageHero,
   SellDeviceStatus,
@@ -8,12 +14,12 @@ import {
   SellStepShipping,
   SellStepComplete,
   SellFlashcards,
-  SellRecentlySold,
-  SellAuctionsPreview,
-  SellStartCTA,
   SellNftMintPreview,
+  SellLanding,
+  SellStepProgress,
 } from "../components/sell";
 import type { SellMintStage } from "../lib/sell/nftPreview";
+import type { SellMode } from "../lib/sell/sellModes";
 
 function sellMintStage(pawnStep: string): SellMintStage {
   if (pawnStep === "val") return "valued";
@@ -23,7 +29,39 @@ function sellMintStage(pawnStep: string): SellMintStage {
 }
 
 export default function SellEwaste() {
+  const router = useRouter();
   const flow = useSellFlow();
+  const wallet = useWallet();
+  const { connection } = useConnection();
+  const [vaultItems, setVaultItems] = useState<VaultItem[]>([]);
+  const [listItem, setListItem] = useState<VaultItem | null>(null);
+  const [listMode, setListMode] = useState<ListingMode>("fixed");
+
+  useEffect(() => {
+    if (!wallet.connected || !wallet.publicKey) {
+      setVaultItems([]);
+      return;
+    }
+    const program = getProgram(wallet, connection);
+    fetchOwnedVaultItems(program, connection, wallet.publicKey)
+      .then(setVaultItems)
+      .catch(console.error);
+  }, [wallet.connected, wallet.publicKey, connection]);
+
+  const handleSelectMode = (mode: SellMode) => {
+    if (mode === "list" || mode === "auction") {
+      const listable = vaultItems.filter((i) => i.status === 0);
+      if (wallet.connected && listable.length > 0) {
+        setListItem(listable[0]);
+        setListMode(mode === "auction" ? "auction" : "fixed");
+        return;
+      }
+      flow.beginIntakeFromList(mode);
+      return;
+    }
+    flow.startMode(mode);
+  };
+
   const inBrowseMode = flow.pawnStep === "landing";
   const inFlashcards = flow.pawnStep === "flashcards";
   const inActiveFlow = ["form", "val", "shipping", "complete"].includes(flow.pawnStep);
@@ -32,15 +70,39 @@ export default function SellEwaste() {
 
   return (
     <Layout wide>
-      <div className={`mx-auto ${inSellFlow ? "max-w-6xl" : "max-w-4xl"}`}>
-        <SellPageHero compact={inFlashcards || inActiveFlow} />
+      <div className={`mx-auto ${inBrowseMode ? "max-w-5xl" : inSellFlow ? "max-w-6xl" : "max-w-4xl"}`}>
+        <SellPageHero
+          compact={inFlashcards || inActiveFlow}
+          sellMode={flow.sellMode}
+          pawnStep={flow.pawnStep}
+        />
 
-        {inBrowseMode && (
-          <>
-            <SellStartCTA onStart={flow.startFlashcards} />
-            <SellRecentlySold />
-            <SellAuctionsPreview />
-          </>
+        {inSellFlow && <SellStepProgress pawnStep={flow.pawnStep} />}
+
+        {flow.intakeBanner && (
+          <div className="sell-intake-banner" role="status">
+            <p>{flow.intakeBanner}</p>
+          </div>
+        )}
+
+        {inBrowseMode && <SellLanding onSelectMode={handleSelectMode} />}
+
+        {listItem && (
+          <ListItemModal
+            item={listItem}
+            initialMode={listMode}
+            onClose={() => {
+              setListItem(null);
+            }}
+            onListed={(mode) => {
+              setListItem(null);
+              if (mode === "auction") {
+                router.push("/auctions");
+              } else {
+                router.push("/market");
+              }
+            }}
+          />
         )}
 
         {inFlashcards && (
