@@ -47,6 +47,17 @@ export default function ProfileEarn({ earnings, onWithdraw }: ProfileEarnProps) 
         </div>
       </section>
 
+      <section className="profile-card profile-fee-flywheel">
+        <h2 className="profile-card__title mb-2">Where your fees go</h2>
+        <p className="profile-card__body mb-4">
+          Platform fees you pay recycle into vault inventory, warehouse verification, and transparent incentive
+          bids on standout listings — not hidden markups.
+        </p>
+        <Link href="/mission" className="text-sm text-emerald-500/90 hover:underline">
+          Read the mission →
+        </Link>
+      </section>
+
       <section className="profile-card">
         <h2 className="profile-card__title mb-2">Payout settings</h2>
         <p className="profile-card__body mb-4">
@@ -54,7 +65,7 @@ export default function ProfileEarn({ earnings, onWithdraw }: ProfileEarnProps) 
         </p>
         <div className="flex flex-wrap gap-2">
           <Link href="/fees" className="btn-secondary text-sm">
-            View fees
+            Fee schedule
           </Link>
           <button type="button" className="btn-secondary text-sm opacity-60 cursor-not-allowed" disabled>
             Add payout email (soon)

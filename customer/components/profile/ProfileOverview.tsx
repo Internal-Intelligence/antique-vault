@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ProfileVerificationCard from "./ProfileVerificationCard";
 import type { ActivityItem, PrestigeBadgeDef, ProfileNextAction } from "./types";
 
 interface ProfileOverviewProps {
@@ -6,6 +7,8 @@ interface ProfileOverviewProps {
   nextAction: ProfileNextAction;
   topBadges: PrestigeBadgeDef[];
   unlockedCount: number;
+  itemCount: number;
+  inCustody: number;
   onOpenBadge: (badge: PrestigeBadgeDef) => void;
   onViewAllBadges: () => void;
 }
@@ -23,11 +26,15 @@ export default function ProfileOverview({
   nextAction,
   topBadges,
   unlockedCount,
+  itemCount,
+  inCustody,
   onOpenBadge,
   onViewAllBadges,
 }: ProfileOverviewProps) {
   return (
     <div className="profile-panel-grid">
+      <ProfileVerificationCard itemCount={itemCount} inCustody={inCustody} />
+
       <section className="profile-card profile-card--highlight">
         <p className="profile-card__eyebrow">Recommended next step</p>
         <h2 className="profile-card__title">{nextAction.title}</h2>
@@ -46,7 +53,7 @@ export default function ProfileOverview({
       <section className="profile-card">
         <div className="profile-card__head">
           <h2 className="profile-card__title">Recent activity</h2>
-          <span className="profile-live-pill">Live sync</span>
+          <span className="profile-sync-pill">Synced</span>
         </div>
         <ul className="profile-activity">
           {activities.map((item) => (
@@ -94,24 +101,24 @@ export default function ProfileOverview({
       </section>
 
       <section className="profile-quick-links">
-        <Link href="/sell" className="profile-quick-link">
-          <span className="profile-quick-link__label">Sell device</span>
+        <Link href="/warehouse" className="profile-quick-link">
+          <span className="profile-quick-link__label">Verification hub</span>
           <span className="profile-quick-link__arrow">→</span>
         </Link>
-        <Link href="/market" className="profile-quick-link">
-          <span className="profile-quick-link__label">Browse market</span>
+        <Link href="/sell" className="profile-quick-link">
+          <span className="profile-quick-link__label">List an item</span>
           <span className="profile-quick-link__arrow">→</span>
         </Link>
         <Link href="/profile?tab=inventory" className="profile-quick-link">
-          <span className="profile-quick-link__label">My inventory</span>
+          <span className="profile-quick-link__label">Inventory</span>
           <span className="profile-quick-link__arrow">→</span>
         </Link>
-        <Link href="/fees" className="profile-quick-link">
-          <span className="profile-quick-link__label">Fee schedule</span>
+        <Link href="/mission" className="profile-quick-link">
+          <span className="profile-quick-link__label">Mission &amp; fees</span>
           <span className="profile-quick-link__arrow">→</span>
         </Link>
-        <Link href="/profile?tab=expand" className="profile-quick-link">
-          <span className="profile-quick-link__label">Grow income</span>
+        <Link href="/acquire" className="profile-quick-link">
+          <span className="profile-quick-link__label">Fund inventory</span>
           <span className="profile-quick-link__arrow">→</span>
         </Link>
       </section>

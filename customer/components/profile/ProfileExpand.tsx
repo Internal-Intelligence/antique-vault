@@ -27,7 +27,8 @@ export default function ProfileExpand({
   return (
     <div className="profile-expand">
       <p className="profile-expand__intro">
-        Shops, affiliates, mail-in recycling, and more — tucked in your profile so the main marketplace stays clean. Tap to expand.
+        Affiliate earnings, mail-in recycling, and future storefront tools — optional programs beyond core
+        buying and selling. Tap to expand.
       </p>
 
       <div className="profile-avenue-grid">

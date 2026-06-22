@@ -1,10 +1,10 @@
 import type { ProfileTab } from "./types";
 
 const TABS: { id: ProfileTab; label: string; hint: string }[] = [
-  { id: "overview", label: "Overview", hint: "Activity & next steps" },
-  { id: "inventory", label: "Inventory", hint: "Your tokenized assets" },
-  { id: "earn", label: "Earn", hint: "Payouts & revenue" },
-  { id: "expand", label: "Grow", hint: "Shops & new income" },
+  { id: "overview", label: "Overview", hint: "Status & next steps" },
+  { id: "inventory", label: "Inventory", hint: "Custody & listings" },
+  { id: "earn", label: "Earn", hint: "Payouts & fees" },
+  { id: "expand", label: "Grow", hint: "Affiliate & programs" },
 ];
 
 interface ProfileNavProps {

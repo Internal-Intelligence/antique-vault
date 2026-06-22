@@ -12,7 +12,7 @@ interface ProfileInventoryProps {
 }
 
 function statusLabel(status: number): { label: string; tone: string } {
-  if (status === 0) return { label: "In storage", tone: "profile-status--vault" };
+  if (status === 0) return { label: "In custody", tone: "profile-status--vault" };
   if (status === 1) return { label: "Listed", tone: "profile-status--listed" };
   if (status === 2) return { label: "Pawned", tone: "profile-status--pawned" };
   return { label: "Held", tone: "profile-status--held" };
@@ -41,11 +41,16 @@ export default function ProfileInventory({
       <div className="profile-empty">
         <p className="profile-empty__title">No inventory yet</p>
         <p className="profile-empty__body">
-          Tokenize your first device to see it here. Sell, pawn, or list from one place.
+          List your first item, ship to the verification warehouse, and track custody here.
         </p>
-        <Link href="/sell" className="btn-primary mt-4">
-          Sell a device
-        </Link>
+        <div className="flex flex-wrap gap-2 justify-center mt-4">
+          <Link href="/sell" className="btn-primary">
+            Start listing
+          </Link>
+          <Link href="/warehouse" className="btn-secondary">
+            Verification hub
+          </Link>
+        </div>
       </div>
     );
   }
@@ -77,6 +82,9 @@ export default function ProfileInventory({
                     <p className="profile-inventory__id">
                       {item.category || "General"} · {item.itemId.slice(0, 10)}
                     </p>
+                    {item.status === 0 && (
+                      <p className="profile-inventory__verified">Warehouse verified</p>
+                    )}
                   </div>
                   <span className={`profile-status ${status.tone}`}>{status.label}</span>
                 </div>

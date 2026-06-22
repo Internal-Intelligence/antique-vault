@@ -8,6 +8,7 @@ interface ProfileHeaderProps {
   totalEarned: number;
   vaultValueCents: number;
   itemCount: number;
+  inCustody: number;
   listingsActive: number;
   onShare: () => void;
 }
@@ -22,6 +23,7 @@ export default function ProfileHeader({
   totalEarned,
   vaultValueCents,
   itemCount,
+  inCustody,
   listingsActive,
   onShare,
 }: ProfileHeaderProps) {
@@ -40,9 +42,9 @@ export default function ProfileHeader({
           <BrandAvatar size={48} title="NFTBAY profile" className="profile-avatar--brand" />
         )}
         <div className="min-w-0 flex-1">
-          <p className="profile-hero__eyebrow">Seller dashboard</p>
+          <p className="profile-hero__eyebrow">Your vault</p>
           <h1 className="profile-hero__title">
-            {connected ? `Seller ${handle}` : "Your profile"}
+            {connected ? handle : "Profile"}
           </h1>
           <p className="profile-hero__meta">
             {connected ? (
@@ -50,9 +52,15 @@ export default function ProfileHeader({
                 <span className="profile-tier">{sellerTier}</span>
                 <span className="profile-dot">·</span>
                 <span>Level {level}</span>
+                {inCustody > 0 && (
+                  <>
+                    <span className="profile-dot">·</span>
+                    <span>{inCustody} in warehouse custody</span>
+                  </>
+                )}
               </>
             ) : (
-              "Connect wallet to sync vault, earnings, and seller tools"
+              "Connect wallet to see inventory, custody status, and payouts"
             )}
           </p>
         </div>
@@ -77,15 +85,15 @@ export default function ProfileHeader({
           </span>
         </div>
         <div className="profile-stat">
-          <span className="profile-stat__label">Items</span>
-          <span className="profile-stat__value">{itemCount}</span>
+          <span className="profile-stat__label">In custody</span>
+          <span className="profile-stat__value">{inCustody}</span>
         </div>
         <div className="profile-stat">
-          <span className="profile-stat__label">Active listings</span>
+          <span className="profile-stat__label">Listed</span>
           <span className="profile-stat__value">{listingsActive}</span>
         </div>
         <div className="profile-stat profile-stat--accent">
-          <span className="profile-stat__label">Total earned</span>
+          <span className="profile-stat__label">Lifetime earned</span>
           <span className="profile-stat__value text-emerald-400">
             ${totalEarned.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
           </span>

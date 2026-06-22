@@ -62,6 +62,7 @@ export default function Profile() {
   const displayItems = connected && items.length > 0 ? items : connected ? [] : DEMO_INVENTORY;
   const vaultValueCents = displayItems.reduce((s, i) => s + (i.appraisedValueUsdCents || 0), 0);
   const listingsActive = displayItems.filter((i) => i.status === 1).length;
+  const inCustody = displayItems.filter((i) => i.status === 0).length;
 
   function isBadgeUnlocked(id: string): boolean {
     return unlockedBadges.has(id) || (badgeProgress[id] || 0) >= 100;
@@ -82,7 +83,7 @@ export default function Profile() {
   const level = Math.max(1, Math.floor(1 + unlockedCount * 0.6 + prestigeScore / 140));
 
   const sellerTier =
-    level >= 8 ? "Power Seller" : level >= 5 ? "Trusted Seller" : level >= 3 ? "Active Seller" : "New Seller";
+    level >= 8 ? "Established seller" : level >= 5 ? "Trusted seller" : level >= 3 ? "Active seller" : "New member";
 
   const earnings: EarningsSnapshot = useMemo(() => {
     const base = vaultValueCents / 100;
@@ -109,7 +110,7 @@ export default function Profile() {
     if (!connected) {
       return {
         title: "Connect your wallet",
-        desc: "Sync vault inventory, earnings, and seller tools in one place.",
+        desc: "See inventory, warehouse custody status, and payouts in one place.",
         href: "/profile",
         cta: "Connect wallet",
         onClick: openWalletConnect,
@@ -117,25 +118,25 @@ export default function Profile() {
     }
     if (displayItems.length === 0) {
       return {
-        title: "Tokenize your first device",
-        desc: "Instant AI valuation, ship to vault, receive your NFT.",
+        title: "List your first item",
+        desc: "AI pricing guidance, ship to the verification warehouse, receive your NFT.",
         href: "/sell",
-        cta: "Sell now",
+        cta: "Start listing",
       };
     }
     if (listingsActive === 0) {
       return {
-        title: "List an item on the market",
-        desc: "Your vault has assets ready. List one to start earning — 5% standard fee.",
-        href: "/?action=list&mode=auction",
-        cta: "Start auction",
+        title: "List from your vault",
+        desc: "Verified items in custody are ready. Fixed price or timed auction — 5% standard fee.",
+        href: "/?action=list",
+        cta: "Create listing",
       };
     }
     return {
-      title: "Boost your top listing",
-      desc: "Promoted listings get 8% fee but higher visibility. Paid boost from $9.",
-      href: "/?action=list&boost=1",
-      cta: "Boost listing",
+      title: "Optional promoted placement",
+      desc: "8% fee for featured visibility, or explore auctions with fee-funded incentive bids.",
+      href: "/auctions",
+      cta: "View auctions",
     };
   }, [connected, displayItems.length, listingsActive, openWalletConnect]);
 
@@ -206,7 +207,7 @@ export default function Profile() {
   }
 
   function shareProfile() {
-    const text = `My NFTBAY seller profile — Level ${level} · $${(vaultValueCents / 100).toLocaleString()} vault · ${displayItems.length} items. #NFTBAY`;
+    const text = `My NFTBAY vault — $${(vaultValueCents / 100).toLocaleString()} · ${displayItems.length} items · warehouse-verified. #NFTBAY`;
     navigator.clipboard.writeText(text);
     showToast("Profile copied to clipboard");
   }
@@ -283,6 +284,7 @@ export default function Profile() {
           totalEarned={earnings.totalEarned}
           vaultValueCents={vaultValueCents}
           itemCount={displayItems.length}
+          inCustody={inCustody}
           listingsActive={listingsActive}
           onShare={shareProfile}
         />
@@ -300,6 +302,8 @@ export default function Profile() {
               nextAction={nextAction}
               topBadges={fallbackBadges}
               unlockedCount={unlockedCount}
+              itemCount={displayItems.length}
+              inCustody={inCustody}
               onOpenBadge={(b) => setSelectedBadge(b)}
               onViewAllBadges={() => setShowAllBadges(true)}
             />
