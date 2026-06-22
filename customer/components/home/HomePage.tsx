@@ -1,5 +1,5 @@
 import HomeHub from "./HomeHub";
-import HomeLiveActivity from "./HomeLiveActivity";
+import HomeGlobeSection from "./HomeGlobeSection";
 import HomeCategoryGrid from "./HomeCategoryGrid";
 import HomeFeaturedRow from "./HomeFeaturedRow";
 import HomeAuctionStrip from "./HomeAuctionStrip";
@@ -12,7 +12,7 @@ export default function HomePage() {
   return (
     <div className="home-page">
       <HomeHub />
-      <HomeLiveActivity />
+      <HomeGlobeSection />
       <HomeYourVault />
       <HomeCategoryGrid />
       <HomeFeaturedRow />

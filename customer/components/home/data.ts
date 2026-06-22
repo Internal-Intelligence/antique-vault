@@ -85,8 +85,8 @@ export const HUB_BUBBLES: HubBubble[] = [
 ];
 
 export const HERO_ROTATIONS = [
-  "Hunt phones, laptops & collectibles worth bragging about",
-  "Every item vault-backed — buy with confidence, sell with pride",
-  "Live auctions, fixed steals & instant pawn — pick your rush",
-  "SOL hits your wallet fast — crypto power, zero friction",
+  "NFTBAY — your bay for vault-backed deals",
+  "Hunt it on Market · flip it on Sell · nail it on Auctions",
+  "Every listing backed by a real item in custody",
+  "SOL in your wallet before the hype fades",
 ];

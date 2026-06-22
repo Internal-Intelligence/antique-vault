@@ -9,7 +9,7 @@ export const PRIMARY_NAV = [
 ] as const;
 
 export const SECONDARY_NAV = [
-  { href: "/acquire", label: "Fund" },
+  { href: "/acquire", label: "Fund", highlight: "fund" as const },
   { href: "/fees", label: "Fees" },
 ] as const;
 
@@ -45,11 +45,12 @@ export function SiteNavStrip({ className = "" }: { className?: string }) {
         <span className="site-nav-strip__divider" aria-hidden />
         {SECONDARY_NAV.map((item) => {
           const active = isActive(router.pathname, item.href);
+          const isFund = "highlight" in item && item.highlight === "fund";
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`site-nav-pill site-nav-pill--secondary ${active ? "site-nav-pill--active" : ""}`}
+              className={`site-nav-pill site-nav-pill--secondary ${isFund ? "site-nav-pill--fund" : ""} ${active ? "site-nav-pill--active" : ""}`}
             >
               {item.label}
             </Link>

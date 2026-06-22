@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
+import HomeSectionReveal, { HomeSectionHeader } from "./HomeSectionReveal";
+import { childFadeUp, staggerContainer } from "./motion";
 
 const AUCTIONS = [
   { id: "A1", name: "DJI Mini 4 Pro Fly More", current: "$412", bids: 7, ends: "2h 14m", hot: true },
@@ -9,26 +11,26 @@ const AUCTIONS = [
 
 export default function HomeAuctionStrip() {
   return (
-    <section className="mb-12">
-      <div className="flex items-end justify-between gap-4 mb-5 px-0.5">
+    <HomeSectionReveal className="mb-12" variant="fadeUp">
+      <HomeSectionHeader className="flex items-end justify-between gap-4 mb-5 px-0.5">
         <div>
           <h2 className="home-section-title">Auctions heating up</h2>
-          <p className="home-section-sub">The clock's running — one bid could be your story tonight.</p>
+          <p className="home-section-sub">The clock&apos;s running — one bid could be your story tonight.</p>
         </div>
         <Link href="/auctions" className="home-link-arrow shrink-0">
           All auctions
         </Link>
-      </div>
+      </HomeSectionHeader>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+        variants={staggerContainer(0.08)}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-40px" }}
+      >
         {AUCTIONS.map((a, i) => (
-          <motion.div
-            key={a.id}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.06 }}
-          >
+          <motion.div key={a.id} variants={childFadeUp}>
             <Link href="/auctions" className="home-auction-card glass-panel glass-panel--card">
               <div className="flex items-start justify-between gap-2">
                 <h3 className="home-auction-name">{a.name}</h3>
@@ -45,7 +47,7 @@ export default function HomeAuctionStrip() {
             </Link>
           </motion.div>
         ))}
-      </div>
-    </section>
+      </motion.div>
+    </HomeSectionReveal>
   );
 }

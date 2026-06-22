@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { PawnForm, Valuation } from "../../lib/sell";
+import { derivePreviewMint, derivePreviewItemId } from "../../lib/sell/nftPreview";
 
 interface SellStepCompleteProps {
   tracking: string;
@@ -9,7 +10,8 @@ interface SellStepCompleteProps {
 }
 
 export default function SellStepComplete({ tracking, valuation, form, onReset }: SellStepCompleteProps) {
-  const nftMint = `VLT-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+  const nftMint = derivePreviewMint(form);
+  const itemId = derivePreviewItemId(form);
 
   return (
     <div className="ios-flow-panel p-8 text-center">
@@ -18,7 +20,8 @@ export default function SellStepComplete({ tracking, valuation, form, onReset }:
       </div>
       <h2 className="text-2xl font-semibold mb-2">Shipment submitted</h2>
       <p className="text-zinc-500 mb-8 max-w-sm mx-auto">
-        Your item is on its way to our warehouse. Once received, your token will be minted and appear in your portfolio.
+        Your item is on its way to our warehouse. Once received, your token will be minted and appear in your
+        portfolio — preview it on the right.
       </p>
 
       <div className="ios-inset text-left mb-8 text-sm space-y-3">
@@ -39,14 +42,22 @@ export default function SellStepComplete({ tracking, valuation, form, onReset }:
           <span>{form.isWorking ? "Working" : "Non-working"}</span>
         </div>
         <div className="flex justify-between gap-4">
-          <span className="text-zinc-500">Token ID (sim)</span>
+          <span className="text-zinc-500">Vault item ID</span>
+          <span className="font-mono text-xs">{itemId}</span>
+        </div>
+        <div className="flex justify-between gap-4">
+          <span className="text-zinc-500">Mint (preview)</span>
           <span className="font-mono text-xs">{nftMint}</span>
         </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
-        <Link href="/profile?tab=inventory" className="btn-secondary">View inventory</Link>
-        <Link href="/market" className="btn-secondary">Browse market</Link>
+        <Link href="/profile?tab=inventory" className="btn-secondary">
+          View inventory
+        </Link>
+        <Link href="/market" className="btn-secondary">
+          Browse market
+        </Link>
         <button type="button" onClick={onReset} className="btn-primary">
           Sell another device
         </button>

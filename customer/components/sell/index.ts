@@ -10,3 +10,4 @@ export { default as SellStepValuation } from "./SellStepValuation";
 export { default as SellStepShipping } from "./SellStepShipping";
 export { default as SellStepComplete } from "./SellStepComplete";
 export { default as QuantumShippingViz } from "./QuantumShippingViz";
+export { default as SellNftMintPreview } from "./SellNftMintPreview";

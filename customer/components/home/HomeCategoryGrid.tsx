@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { HOME_CATEGORIES } from "./data";
+import HomeSectionReveal, { HomeSectionHeader } from "./HomeSectionReveal";
+import { childFadeUp, staggerContainer } from "./motion";
 
 export default function HomeCategoryGrid() {
   return (
-    <section className="mb-12">
-      <div className="flex items-end justify-between gap-4 mb-5 px-0.5">
+    <HomeSectionReveal className="mb-12" variant="fadeUp" delay={0.05}>
+      <HomeSectionHeader className="flex items-end justify-between gap-4 mb-5 px-0.5">
         <div>
           <h2 className="home-section-title">Shop by vibe</h2>
           <p className="home-section-sub">Tap what excites you — every category is a rabbit hole worth diving into.</p>
@@ -13,17 +15,17 @@ export default function HomeCategoryGrid() {
         <Link href="/market" className="home-link-arrow shrink-0">
           All categories
         </Link>
-      </div>
+      </HomeSectionHeader>
 
-      <div className="home-category-grid">
-        {HOME_CATEGORIES.map((cat, i) => (
-          <motion.div
-            key={cat.id}
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ delay: i * 0.04, duration: 0.35 }}
-          >
+      <motion.div
+        className="home-category-grid"
+        variants={staggerContainer(0.05)}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-40px" }}
+      >
+        {HOME_CATEGORIES.map((cat) => (
+          <motion.div key={cat.id} variants={childFadeUp}>
             <Link
               href={`/market?q=${encodeURIComponent(cat.query)}`}
               className={`home-category-card glass-panel glass-panel--tile bg-gradient-to-br ${cat.gradient}`}
@@ -34,7 +36,7 @@ export default function HomeCategoryGrid() {
             </Link>
           </motion.div>
         ))}
-      </div>
-    </section>
+      </motion.div>
+    </HomeSectionReveal>
   );
 }

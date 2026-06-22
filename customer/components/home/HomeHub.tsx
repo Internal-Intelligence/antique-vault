@@ -3,6 +3,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { HERO_ROTATIONS, HUB_BUBBLES } from "./data";
 import HomeSearch from "./HomeSearch";
+import { childScaleIn, softTransition, staggerContainer } from "./motion";
 
 export default function HomeHub() {
   const [phraseIdx, setPhraseIdx] = useState(0);
@@ -13,15 +14,30 @@ export default function HomeHub() {
   }, []);
 
   return (
-    <section className="home-hub mb-10">
+    <motion.section
+      className="home-hub mb-10"
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={softTransition(0.75)}
+    >
       <div className="home-hub-ambient" aria-hidden>
         <span className="home-hub-orb home-hub-orb--emerald" />
         <span className="home-hub-orb home-hub-orb--violet" />
         <span className="home-hub-orb home-hub-orb--amber" />
       </div>
 
-      <div className="home-hub-shell glass-panel">
-        <div className="home-hub-top">
+      <motion.div
+        className="home-hub-shell glass-panel"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={softTransition(0.65, 0.12)}
+      >
+        <motion.div
+          className="home-hub-top"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={softTransition(0.55, 0.2)}
+        >
           <div className="flex flex-wrap items-center gap-2">
             <span className="home-pill home-pill--live home-pill--pulse">Live marketplace</span>
             <span className="home-pill">Keep 92%+ after fees</span>
@@ -29,45 +45,50 @@ export default function HomeHub() {
           </div>
 
           <h1 className="home-hero-title max-w-3xl mt-6">
-            Find your next{" "}
-            <span className="home-hero-accent home-hero-accent--warm">win</span>
+            <span className="home-hero-brand">NFTBAY</span>
             <br className="hidden sm:block" />
-            {" "}— real gear, real payouts
+            {" "}— real gear in,{" "}
+            <span className="home-hero-accent home-hero-accent--warm">real SOL out</span>
           </h1>
 
           <p className="home-hero-sub max-w-2xl mt-4">
-            The thrill of scoring a deal. The rush of selling in minutes. NFTBAY is where collectors,
-            flippers, and everyday shoppers hunt vault-backed goods with instant SOL — no crypto PhD required.
+            The marketplace that sticks with you: vault-backed phones, laptops &amp; collectibles —
+            buy, bid, sell, and get paid on Solana without the crypto headache.
           </p>
 
           <div className="h-7 mt-3 overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.p
                 key={phraseIdx}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.35 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={softTransition(0.4)}
                 className="text-sm font-medium text-emerald-400/90"
               >
                 ↳ {HERO_ROTATIONS[phraseIdx]}
               </motion.p>
             </AnimatePresence>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="home-hub-core glass-panel glass-panel--inner mt-8">
+        <motion.div
+          className="home-hub-core glass-panel glass-panel--inner mt-8"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={softTransition(0.6, 0.28)}
+        >
           <p className="home-hub-core-label">Start here</p>
           <HomeSearch large glass hub />
 
-          <div className="home-bubble-grid mt-6">
-            {HUB_BUBBLES.map((bubble, i) => (
-              <motion.div
-                key={bubble.id}
-                initial={{ opacity: 0, scale: 0.92 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.08 + i * 0.05, duration: 0.4, type: "spring", stiffness: 260, damping: 22 }}
-              >
+          <motion.div
+            className="home-bubble-grid mt-6"
+            variants={staggerContainer(0.06, 0.35)}
+            initial="hidden"
+            animate="visible"
+          >
+            {HUB_BUBBLES.map((bubble) => (
+              <motion.div key={bubble.id} variants={childScaleIn}>
                 <Link href={bubble.href} className={`glass-bubble glass-bubble--${bubble.tone}`}>
                   <span className="glass-bubble-icon" aria-hidden>
                     {bubble.icon}
@@ -80,10 +101,15 @@ export default function HomeHub() {
                 </Link>
               </motion.div>
             ))}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="home-hub-footer mt-6 flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3">
+        <motion.div
+          className="home-hub-footer mt-6 flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={softTransition(0.5, 0.45)}
+        >
           <Link href="/market" className="glass-cta glass-cta--primary">
             Explore trending deals
           </Link>
@@ -93,8 +119,8 @@ export default function HomeHub() {
           <p className="text-xs text-zinc-500 sm:ml-auto">
             <span className="text-rose-300/80">♥</span> Trusted by hunters &amp; sellers alike
           </p>
-        </div>
-      </div>
-    </section>
+        </motion.div>
+      </motion.div>
+    </motion.section>
   );
 }
