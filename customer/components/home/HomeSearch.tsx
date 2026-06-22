@@ -44,7 +44,7 @@ export default function HomeSearch({ large, compact, glass, hub }: Props) {
         placeholder={
           compact
             ? "Search NFTBAY…"
-            : "What are you hunting? Phones, laptops, gaming, collectibles…"
+            : "Search phones, laptops, gaming, collectibles…"
         }
         className="home-search-input"
         aria-label="Search marketplace"

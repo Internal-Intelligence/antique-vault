@@ -10,7 +10,7 @@ export default function HomeHowItWorks() {
       <HomeSectionHeader className="text-center mb-8">
         <h2 className="home-section-title">How NFTBAY works</h2>
         <p className="home-section-sub mx-auto max-w-lg">
-          Four steps from &ldquo;I should sell this&rdquo; to SOL in your wallet — or a verified treasure at your door.
+          Four steps from listing to settlement — sell for SOL or redeem the physical item.
         </p>
       </HomeSectionHeader>
 

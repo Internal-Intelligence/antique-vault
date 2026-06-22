@@ -9,8 +9,8 @@ export default function HomeCategoryGrid() {
     <HomeSectionReveal className="mb-12" variant="fadeUp" delay={0.05}>
       <HomeSectionHeader className="flex items-end justify-between gap-4 mb-5 px-0.5">
         <div>
-          <h2 className="home-section-title">Shop by vibe</h2>
-          <p className="home-section-sub">Tap what excites you — every category is a rabbit hole worth diving into.</p>
+          <h2 className="home-section-title">Browse categories</h2>
+          <p className="home-section-sub">Phones, laptops, collectibles, and more — all vault-backed.</p>
         </div>
         <Link href="/market" className="home-link-arrow shrink-0">
           All categories

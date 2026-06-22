@@ -15,14 +15,14 @@ export default function HomeSellerBand() {
             transition={softTransition(0.6)}
           >
             <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400/80 mb-2">
-              Sellers win here
+              Sell with confidence
             </p>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-3">
-              That closet? It&apos;s sitting on SOL
+              Turn unused gear into SOL
             </h2>
             <p className="text-sm text-zinc-400 leading-relaxed mb-6">
-              List in minutes, get AI pricing, vault custody, and promoted reach — then watch payouts land.
-              Keep more than legacy marketplaces. Feel good selling again.
+              List in minutes with AI pricing guidance, vault custody, and clear fee breakdowns.
+              Keep more than legacy marketplaces — without the pressure tactics.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/sell" className="btn-primary">

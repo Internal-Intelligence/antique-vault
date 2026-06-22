@@ -51,9 +51,9 @@ export default function HomeYourVault() {
         delay={0.1}
       >
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">Your vault awaits</h2>
+          <h2 className="text-lg font-semibold tracking-tight">Your vault</h2>
           <p className="text-sm text-zinc-500 mt-1">
-            Connect a wallet to track inventory, flex achievements, and watch earnings grow.
+            Connect a wallet to see inventory, custody status, and earnings in one place.
           </p>
         </div>
         <p className="text-xs text-zinc-600">Use the wallet button in the header ↑</p>

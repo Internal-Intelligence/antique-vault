@@ -1,5 +1,12 @@
-import { LIVE_ACTIVITY } from "../components/home/data";
 import { LIVE_BUYERS, ROUTE_ORIGIN_COORDS, SHIPPING_HUBS, type LiveBuyer } from "./shippingGlobe";
+
+const LIVE_ACTIVITY = [
+  { who: "alex.sol", action: "purchased", item: "RTX 4080 Founders", ago: "2m" },
+  { who: "maya.eth", action: "listed", item: "iPad Pro 12.9\"", ago: "4m" },
+  { who: "vault_ops", action: "shipped", item: "ThinkPad X1", ago: "6m" },
+  { who: "jaydan", action: "pawned", item: "PS5 Slim", ago: "9m" },
+  { who: "collector", action: "redeemed", item: "Leica D-Lux", ago: "11m" },
+];
 
 export type GlobeActivityKind = "buy" | "sell" | "ship" | "pawn" | "list";
 
@@ -38,7 +45,7 @@ function inferKind(action: string): GlobeActivityKind {
   if (a.includes("ship")) return "ship";
   if (a.includes("pawn")) return "pawn";
   if (a.includes("list")) return "list";
-  if (a.includes("won") || a.includes("snag")) return "buy";
+  if (a.includes("won") || a.includes("snag") || a.includes("purchas") || a.includes("redeem")) return "buy";
   return "buy";
 }
 

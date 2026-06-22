@@ -20,9 +20,9 @@ export const HOME_CATEGORIES: HomeCategory[] = [
 
 export const HOME_STATS = [
   { label: "You keep", value: "92%+", detail: "More than legacy marketplaces" },
-  { label: "Payout speed", value: "Instant", detail: "SOL lands when you win" },
+  { label: "Payout speed", value: "Instant", detail: "SOL when the sale settles" },
   { label: "Peace of mind", value: "Insured", detail: "Real item, real custody" },
-  { label: "Built for", value: "Everyone", detail: "Collectors, flippers & normies" },
+  { label: "Built for", value: "Everyone", detail: "Collectors, sellers & everyday owners" },
 ];
 
 export const HOME_TRUST_PILLS = [
@@ -33,10 +33,10 @@ export const HOME_TRUST_PILLS = [
 ];
 
 export const HOME_HOW_IT_WORKS = [
-  { step: "01", title: "Find or list", desc: "Search the market or snap photos — AI suggests fair pricing in seconds.", icon: "🔍" },
-  { step: "02", title: "Vault custody", desc: "Ship to our warehouse or hold in vault. Physical item backs your NFT.", icon: "📦" },
-  { step: "03", title: "Buy, bid, or pawn", desc: "Fixed price, live auctions, or instant pawn offers — your call.", icon: "💫" },
-  { step: "04", title: "Cash out or redeem", desc: "Sell for SOL, boost earnings, or burn to receive the real thing.", icon: "✨" },
+  { step: "01", title: "Find or list", desc: "Search the market or add photos — AI suggests fair pricing from comparable sales.", icon: "🔍" },
+  { step: "02", title: "Vault custody", desc: "Ship to our warehouse or hold in vault. The physical item backs your NFT.", icon: "📦" },
+  { step: "03", title: "Buy, bid, or pawn", desc: "Fixed price, timed auctions, or pawn offers — choose what fits.", icon: "💫" },
+  { step: "04", title: "Cash out or redeem", desc: "Sell for SOL, hold in vault, or burn to receive the real item shipped to you.", icon: "✨" },
 ];
 
 export type CuratedPick = {
@@ -50,20 +50,12 @@ export type CuratedPick = {
 };
 
 export const CURATED_PICKS: CuratedPick[] = [
-  { id: "PICK-101", name: "iPhone 15 Pro 256GB", category: "Smartphones", priceUsd: 749, condition: 4, badge: "Hot deal", mint: "curated-iphone15" },
+  { id: "PICK-101", name: "iPhone 15 Pro 256GB", category: "Smartphones", priceUsd: 749, condition: 4, badge: "Featured", mint: "curated-iphone15" },
   { id: "PICK-102", name: "MacBook Air M2", category: "Laptops", priceUsd: 689, condition: 3, badge: "Vault verified", mint: "curated-mba-m2" },
   { id: "PICK-103", name: "Sony WH-1000XM5", category: "Audio", priceUsd: 198, condition: 4, mint: "curated-xm5" },
-  { id: "PICK-104", name: "Nintendo Switch OLED", category: "Gaming", priceUsd: 265, condition: 3, badge: "Ending soon", mint: "curated-switch" },
+  { id: "PICK-104", name: "Nintendo Switch OLED", category: "Gaming", priceUsd: 265, condition: 3, badge: "In vault", mint: "curated-switch" },
   { id: "PICK-105", name: "Canon EOS R50 Kit", category: "Cameras", priceUsd: 542, condition: 3, mint: "curated-r50" },
   { id: "PICK-106", name: "Apple Watch Ultra 2", category: "Wearables", priceUsd: 599, condition: 4, badge: "Promoted", mint: "curated-ultra2" },
-];
-
-export const LIVE_ACTIVITY = [
-  { who: "alex.sol", action: "just won", item: "RTX 4080 Founders", ago: "2m" },
-  { who: "maya.eth", action: "listed a steal", item: "iPad Pro 12.9\"", ago: "4m" },
-  { who: "vault_ops", action: "shipped", item: "ThinkPad X1", ago: "6m" },
-  { who: "jaydan", action: "pawned for cash", item: "PS5 Slim", ago: "9m" },
-  { who: "collector", action: "snagged", item: "Leica D-Lux", ago: "11m" },
 ];
 
 export type HubBubble = {
@@ -76,17 +68,17 @@ export type HubBubble = {
 };
 
 export const HUB_BUBBLES: HubBubble[] = [
-  { id: "deals", label: "Deals", tagline: "Score something rare", icon: "✨", href: "/market", tone: "emerald" },
-  { id: "sell", label: "Sell", tagline: "Cash out in 60 sec", icon: "💰", href: "/sell", tone: "amber" },
-  { id: "bid", label: "Bid", tagline: "Out-snipe the room", icon: "🔥", href: "/auctions", tone: "rose" },
-  { id: "pawn", label: "Pawn", tagline: "Instant liquidity", icon: "⚡", href: "/sell", tone: "violet" },
-  { id: "vault", label: "Vault", tagline: "Your inventory HQ", icon: "🏦", href: "/profile", tone: "sky" },
-  { id: "auctions", label: "Auctions", tagline: "Clock is ticking", icon: "⏱️", href: "/auctions", tone: "cyan" },
+  { id: "browse", label: "Browse", tagline: "Vault-backed listings", icon: "🔍", href: "/market", tone: "emerald" },
+  { id: "sell", label: "Sell", tagline: "List with custody", icon: "📦", href: "/sell", tone: "amber" },
+  { id: "bid", label: "Auctions", tagline: "Timed, transparent bids", icon: "⏱️", href: "/auctions", tone: "sky" },
+  { id: "pawn", label: "Pawn", tagline: "Collateral liquidity", icon: "💳", href: "/sell", tone: "violet" },
+  { id: "vault", label: "Vault", tagline: "Your inventory", icon: "🏦", href: "/profile", tone: "cyan" },
+  { id: "fees", label: "Fees", tagline: "Clear, upfront pricing", icon: "📋", href: "/fees", tone: "rose" },
 ];
 
 export const HERO_ROTATIONS = [
-  "NFTBAY — your bay for vault-backed deals",
-  "Hunt it on Market · flip it on Sell · nail it on Auctions",
   "Every listing backed by a real item in custody",
-  "SOL in your wallet before the hype fades",
+  "Transparent fees — escrow on every sale",
+  "Buy, sell, or redeem without the crypto headache",
+  "Vault-first marketplace on Solana",
 ];

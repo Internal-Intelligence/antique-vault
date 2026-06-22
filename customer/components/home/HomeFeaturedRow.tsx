@@ -82,15 +82,15 @@ export default function HomeFeaturedRow() {
     <HomeSectionReveal className="mb-12" variant="fadeUp">
       <HomeSectionHeader className="flex items-end justify-between gap-4 mb-5 px-0.5">
         <div>
-          <h2 className="home-section-title">Picked for your next obsession</h2>
+          <h2 className="home-section-title">From the vault</h2>
           <p className="home-section-sub">
             {showCurated
-              ? "Hand-selected steals while listings go live — the good stuff disappears fast."
-              : "Fresh drops from the marketplace — someone's about to beat you to these."}
+              ? "Sample listings while the market fills in — each backed by a real item in custody."
+              : "Current marketplace listings with verified condition and vault status."}
           </p>
         </div>
         <Link href="/market" className="home-link-arrow shrink-0">
-          See all deals
+          Browse market
         </Link>
       </HomeSectionHeader>
 

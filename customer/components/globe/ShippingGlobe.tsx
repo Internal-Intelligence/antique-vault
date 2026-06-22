@@ -871,8 +871,12 @@ function LiveGlobeScene({
 
   return (
     <>
-      <color attach="background" args={["#020308"]} />
-      <fog attach="fog" args={["#060a14", 10, 28]} />
+      {!isHome && <color attach="background" args={["#020308"]} />}
+      {isHome ? (
+        <fog attach="fog" args={["#09090b", 14, 32]} />
+      ) : (
+        <fog attach="fog" args={["#060a14", 10, 28]} />
+      )}
 
       <SpaceBackdrop lite={isHome} />
 
@@ -1057,7 +1061,7 @@ function ShippingGlobeCanvas({
     <Canvas
       camera={{ position: [0, 1.2, 6.8], fov: mode === "home" ? 40 : 42 }}
       gl={{
-        alpha: false,
+        alpha: isHome,
         antialias: true,
         powerPreference: "high-performance",
         toneMapping: THREE.ACESFilmicToneMapping,
@@ -1143,7 +1147,7 @@ export default function ShippingGlobe({
         role="img"
         aria-label="Loading live shipping globe"
       >
-        <div className="absolute inset-0 flex items-center justify-center bg-[#020308]">
+        <div className="absolute inset-0 flex items-center justify-center home-globe-loading">
           <div className="text-center">
             <div className="text-purple-300 text-xs tracking-[3px] mb-1">LIVE NETWORK</div>
             <div className="animate-pulse text-white/50 text-[10px]">Initializing global mesh…</div>

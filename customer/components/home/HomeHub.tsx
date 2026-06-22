@@ -39,21 +39,21 @@ export default function HomeHub() {
           transition={softTransition(0.55, 0.2)}
         >
           <div className="flex flex-wrap items-center gap-2">
-            <span className="home-pill home-pill--live home-pill--pulse">Live marketplace</span>
+            <span className="home-pill home-pill--rose">Vault-backed marketplace</span>
             <span className="home-pill">Keep 92%+ after fees</span>
-            <span className="home-pill home-pill--rose">Vault-backed every item</span>
+            <span className="home-pill">Escrow on every sale</span>
           </div>
 
           <h1 className="home-hero-title max-w-3xl mt-6">
             <span className="home-hero-brand">NFTBAY</span>
             <br className="hidden sm:block" />
-            {" "}— real gear in,{" "}
-            <span className="home-hero-accent home-hero-accent--warm">real SOL out</span>
+            {" "}— physical items,{" "}
+            <span className="home-hero-accent">clear ownership</span>
           </h1>
 
           <p className="home-hero-sub max-w-2xl mt-4">
-            The marketplace that sticks with you: vault-backed phones, laptops &amp; collectibles —
-            buy, bid, sell, and get paid on Solana without the crypto headache.
+            A calm place to buy, sell, and hold vault-backed phones, laptops, and collectibles —
+            with real custody, transparent fees, and payouts on Solana.
           </p>
 
           <div className="h-7 mt-3 overflow-hidden">
@@ -64,7 +64,7 @@ export default function HomeHub() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={softTransition(0.4)}
-                className="text-sm font-medium text-emerald-400/90"
+                className="text-sm font-medium text-zinc-400"
               >
                 ↳ {HERO_ROTATIONS[phraseIdx]}
               </motion.p>
@@ -111,13 +111,13 @@ export default function HomeHub() {
           transition={softTransition(0.5, 0.45)}
         >
           <Link href="/market" className="glass-cta glass-cta--primary">
-            Explore trending deals
+            Browse the market
           </Link>
           <Link href="/profile" className="glass-cta glass-cta--ghost">
-            Your command center →
+            Your profile →
           </Link>
           <p className="text-xs text-zinc-500 sm:ml-auto">
-            <span className="text-rose-300/80">♥</span> Trusted by hunters &amp; sellers alike
+            Trusted by collectors &amp; sellers
           </p>
         </motion.div>
       </motion.div>
