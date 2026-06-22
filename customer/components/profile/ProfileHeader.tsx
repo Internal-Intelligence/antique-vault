@@ -35,7 +35,7 @@ export default function ProfileHeader({
           {connected ? handle.slice(0, 2).toUpperCase() : "?"}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="profile-hero__eyebrow">Seller command center</p>
+          <p className="profile-hero__eyebrow">Seller dashboard</p>
           <h1 className="profile-hero__title">
             {connected ? `Seller ${handle}` : "Your profile"}
           </h1>
@@ -66,7 +66,7 @@ export default function ProfileHeader({
 
       <div className="profile-stats">
         <div className="profile-stat">
-          <span className="profile-stat__label">Vault value</span>
+          <span className="profile-stat__label">Inventory value</span>
           <span className="profile-stat__value">
             ${(vaultValueCents / 100).toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </span>

@@ -1,5 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { useRouter } from "next/router";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { CATEGORIES, requireIdVerification, simulateIdVerificationGate, predictEwasteQuantum } from "../lib/anchor";
+import { attemptMailInPawnIntake } from "../lib/nftbay";
 import {
   computeQuantumValuation,
   computeBoostPreview,
@@ -27,7 +30,7 @@ export interface SellFlowActions {
   updateForm: <K extends keyof PawnForm>(key: K, val: PawnForm[K]) => void;
   answerBubble: (qKey: string, opt: string, onSelect: (v: string) => void) => void;
   runQuantumAutoDetect: () => void;
-  acceptPawn: () => void;
+  acceptPawn: () => void | Promise<void>;
   startShippingSim: () => void;
   resetAll: () => void;
   applyGrokRec: () => void;
@@ -50,6 +53,8 @@ export interface SellFlowActions {
   runAiOptimizer: () => void;
   selectRoute: (idx: number) => void;
   onShipAddressChange: (value: string) => void;
+  onChainPawnStatus: string | null;
+  onChainPawnBlockers: string[];
 }
 
 export type UseSellFlowReturn = SellFlowState & {
@@ -60,6 +65,9 @@ export type UseSellFlowReturn = SellFlowState & {
 } & SellFlowActions;
 
 export function useSellFlow(): UseSellFlowReturn {
+  const router = useRouter();
+  const wallet = useWallet();
+  const { connection } = useConnection();
   const [form, setForm] = useState<PawnForm>(DEFAULT_FORM);
   const [valuation, setValuation] = useState<Valuation | null>(null);
   const [showVal, setShowVal] = useState(false);
@@ -75,8 +83,22 @@ export function useSellFlow(): UseSellFlowReturn {
   const [boostEnabled, setBoostEnabled] = useState(false);
   const [boostPercent, setBoostPercent] = useState(8);
   const [grokRec, setGrokRec] = useState("");
+  const [onChainPawnStatus, setOnChainPawnStatus] = useState<string | null>(null);
+  const [onChainPawnBlockers, setOnChainPawnBlockers] = useState<string[]>([]);
 
   const val = valuation;
+
+  useEffect(() => {
+    if (!router.isReady || router.query.program !== "ewaste-mailin") return;
+    setForm((prev) => ({
+      ...prev,
+      category: "Other E-Waste",
+      description:
+        prev.description || "Mail-in e-waste bundle — phones, laptops, cables, small electronics under 15 lbs",
+      weightLbs: prev.weightLbs === DEFAULT_FORM.weightLbs ? "5" : prev.weightLbs,
+      isWorking: false,
+    }));
+  }, [router.isReady, router.query.program]);
 
   const updateForm = useCallback(<K extends keyof PawnForm>(key: K, val: PawnForm[K]) => {
     setForm((prev) => ({ ...prev, [key]: val }));
@@ -202,20 +224,41 @@ export function useSellFlow(): UseSellFlowReturn {
     }, 620);
   }, [form.deviceName, updateForm]);
 
-  const acceptPawn = useCallback(() => {
+  const acceptPawn = useCallback(async () => {
     if (!valuation) return;
     requireIdVerification("sell-pawn-" + form.deviceName, "pawn-accept");
     const gate = simulateIdVerificationGate("sell-e-waste", "AI-intake");
     console.log("[QUANTUM AI INTAKE ENHANCED]", gate);
+
+    const address = shipAddress.trim() || "Austin, TX • Quantum Hub";
+    if (!shipAddress.trim()) setShipAddress(address);
+
+    const intake = await attemptMailInPawnIntake(wallet, connection, {
+      deviceName: form.deviceName || form.category,
+      category: form.category,
+      offerUsdCents: Math.round(valuation.offerUsd * 100),
+      shipAddress: address,
+      isWorking: form.isWorking,
+    });
+    setOnChainPawnStatus(intake.message);
+    setOnChainPawnBlockers(intake.blockers);
+    console.log("[NFTBAY MAIL-IN PAWN]", intake);
+
+    if (!intake.success) {
+      console.info(
+        "[NFTBAY] On-chain path blocked — required after vault mint:",
+        "wallet + NFT mint → submitAiPawnOffer → createPawnPosition"
+      );
+    }
+
     setPawnStep("shipping");
     setShippingProgress(0);
     setCurrentShipStep(0);
     setIs3DAnimating(true);
     setOptimizedRouteIndex(null);
-    if (!shipAddress.trim()) setShipAddress("Austin, TX • Quantum Hub");
     const track = "QNTM-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-QUANTUM";
     setTracking(track);
-  }, [valuation, form.deviceName, shipAddress]);
+  }, [valuation, form.deviceName, form.category, form.isWorking, shipAddress, wallet, connection]);
 
   const startShippingSim = useCallback(() => {
     if (!shipAddress.trim()) {
@@ -257,6 +300,8 @@ export function useSellFlow(): UseSellFlowReturn {
     setAutoDetectMsg("");
     setIs3DAnimating(false);
     setOptimizedRouteIndex(null);
+    setOnChainPawnStatus(null);
+    setOnChainPawnBlockers([]);
   }, []);
 
   const goToValuation = useCallback(() => {
@@ -335,5 +380,7 @@ export function useSellFlow(): UseSellFlowReturn {
     runAiOptimizer,
     selectRoute,
     onShipAddressChange,
+    onChainPawnStatus,
+    onChainPawnBlockers,
   };
 }

@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/router";
 import Layout from "../components/Layout";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { getProgram } from "../lib/anchor";
 import { fetchOwnedVaultItems, VaultItem } from "../lib/fetchOwnedItems";
 import {
@@ -16,10 +17,12 @@ import {
   PRESTIGE_DEFS,
   INCOME_AVENUES,
   buildDemoActivity,
+  parseProfileTab,
   type ProfileTab,
   type EarningsSnapshot,
   type PrestigeBadgeDef,
   type IncomeAvenue,
+  type ProfileNextAction,
 } from "../components/profile";
 
 const DEMO_INVENTORY: VaultItem[] = [
@@ -32,8 +35,10 @@ export default function Profile() {
   const router = useRouter();
   const { connection } = useConnection();
   const wallet = useWallet();
+  const { setVisible: setWalletModalVisible } = useWalletModal();
 
   const [activeTab, setActiveTab] = useState<ProfileTab>("overview");
+  const [expandedAvenue, setExpandedAvenue] = useState<string | null>(null);
   const [items, setItems] = useState<VaultItem[]>([]);
   const [invLoading, setInvLoading] = useState(false);
   const [toast, setToast] = useState("");
@@ -96,18 +101,66 @@ export default function Profile() {
     [displayItems.length, vaultValueCents]
   );
 
-  const nextAction = useMemo(() => {
+  const openWalletConnect = useCallback(() => {
+    setWalletModalVisible(true);
+  }, [setWalletModalVisible]);
+
+  const nextAction = useMemo((): ProfileNextAction => {
     if (!connected) {
-      return { title: "Connect your wallet", desc: "Sync vault inventory, earnings, and seller tools in one place.", href: "/sell", cta: "Get started" };
+      return {
+        title: "Connect your wallet",
+        desc: "Sync vault inventory, earnings, and seller tools in one place.",
+        href: "/profile",
+        cta: "Connect wallet",
+        onClick: openWalletConnect,
+      };
     }
     if (displayItems.length === 0) {
-      return { title: "Tokenize your first device", desc: "Instant AI valuation, ship to vault, receive your NFT.", href: "/sell", cta: "Sell now" };
+      return {
+        title: "Tokenize your first device",
+        desc: "Instant AI valuation, ship to vault, receive your NFT.",
+        href: "/sell",
+        cta: "Sell now",
+      };
     }
     if (listingsActive === 0) {
-      return { title: "List an item on the market", desc: "Your vault has assets ready. List one to start earning — 5% standard fee.", href: "/", cta: "Go to vault" };
+      return {
+        title: "List an item on the market",
+        desc: "Your vault has assets ready. List one to start earning — 5% standard fee.",
+        href: "/?action=list",
+        cta: "List now",
+      };
     }
-    return { title: "Boost your top listing", desc: "Promoted listings get 8% fee but higher visibility. Paid boost from $9.", href: "/market", cta: "View market" };
-  }, [connected, displayItems.length, listingsActive]);
+    return {
+      title: "Boost your top listing",
+      desc: "Promoted listings get 8% fee but higher visibility. Paid boost from $9.",
+      href: "/?action=list&boost=1",
+      cta: "Boost listing",
+    };
+  }, [connected, displayItems.length, listingsActive, openWalletConnect]);
+
+  const setProfileTab = useCallback(
+    (tab: ProfileTab) => {
+      setActiveTab(tab);
+      const query = tab === "overview" ? {} : { tab };
+      router.replace({ pathname: "/profile", query }, undefined, { shallow: true });
+    },
+    [router]
+  );
+
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    const tab = parseProfileTab(router.query.tab);
+    if (tab) setActiveTab(tab);
+
+    const avenue = Array.isArray(router.query.avenue) ? router.query.avenue[0] : router.query.avenue;
+    if (avenue) {
+      setActiveTab("expand");
+      setExpandedAvenue(avenue);
+      if (avenue === "ewaste-mailin") setShowEwasteMailin(true);
+    }
+  }, [router.isReady, router.query.tab, router.query.avenue]);
 
   const topBadges = PRESTIGE_DEFS.filter((b) => isBadgeUnlocked(b.id)).slice(0, 4);
   const fallbackBadges = topBadges.length >= 4 ? topBadges : [...topBadges, ...PRESTIGE_DEFS.filter((b) => !isBadgeUnlocked(b.id))].slice(0, 4);
@@ -189,9 +242,15 @@ export default function Profile() {
 
   function handleAvenueAction(avenue: IncomeAvenue) {
     if (avenue.id === "affiliate") {
-      const link = `https://nftbay.app/ref/demo-${level}`;
+      const refId = wallet.publicKey?.toBase58().slice(0, 8) || `demo-${level}`;
+      const origin = typeof window !== "undefined" ? window.location.origin : "https://nftbay.app";
+      const link = `${origin}/ref/${refId}`;
       navigator.clipboard.writeText(link);
-      showToast("Affiliate link copied");
+      showToast(`Affiliate link copied — ${link}`);
+      return;
+    }
+    if (avenue.id === "shop") {
+      showToast("You're on the shop waitlist — we'll notify you when storefronts open");
       return;
     }
     if (avenue.id === "ewaste-mailin") {
@@ -224,7 +283,7 @@ export default function Profile() {
           onShare={shareProfile}
         />
 
-        <ProfileNav active={activeTab} onChange={setActiveTab} />
+        <ProfileNav active={activeTab} onChange={setProfileTab} />
 
         <div
           id={`profile-panel-${activeTab}`}
@@ -259,7 +318,11 @@ export default function Profile() {
           )}
 
           {activeTab === "expand" && (
-            <ProfileExpand avenues={INCOME_AVENUES} onAvenueAction={handleAvenueAction} />
+            <ProfileExpand
+              avenues={INCOME_AVENUES}
+              initialExpandedId={expandedAvenue}
+              onAvenueAction={handleAvenueAction}
+            />
           )}
         </div>
       </div>

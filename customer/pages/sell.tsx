@@ -63,6 +63,8 @@ export default function SellEwaste() {
             onStartSim={flow.startShippingSim}
             onRunAiOptimizer={flow.runAiOptimizer}
             onSelectRoute={flow.selectRoute}
+            onChainPawnStatus={flow.onChainPawnStatus}
+            onChainPawnBlockers={flow.onChainPawnBlockers}
           />
         )}
 
@@ -76,7 +78,7 @@ export default function SellEwaste() {
         )}
 
         <p className="text-center text-[10px] text-gray-600 mt-10">
-          Physical items only. ID verification on high-value actions. Mail-in e-waste available in your profile.
+          Physical items only. ID verification on high-value actions. Optional mail-in recycling is available in your profile.
         </p>
       </div>
     </Layout>

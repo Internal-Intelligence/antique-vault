@@ -12,7 +12,7 @@ interface ProfileInventoryProps {
 }
 
 function statusLabel(status: number): { label: string; tone: string } {
-  if (status === 0) return { label: "In vault", tone: "profile-status--vault" };
+  if (status === 0) return { label: "In storage", tone: "profile-status--vault" };
   if (status === 1) return { label: "Listed", tone: "profile-status--listed" };
   if (status === 2) return { label: "Pawned", tone: "profile-status--pawned" };
   return { label: "Held", tone: "profile-status--held" };
@@ -31,7 +31,7 @@ export default function ProfileInventory({
     return (
       <div className="profile-empty">
         <div className="animate-spin rounded-full h-7 w-7 border-t-2 border-emerald-500 mx-auto mb-3" />
-        <p>Syncing vault from chain…</p>
+        <p>Syncing inventory from chain…</p>
       </div>
     );
   }
@@ -99,7 +99,7 @@ export default function ProfileInventory({
       </ul>
 
       <p className="profile-footnote">
-        Full vault management on your{" "}
+        Full inventory management on your{" "}
         <Link href="/" className="text-emerald-500/90 hover:text-emerald-400">
           portfolio page
         </Link>

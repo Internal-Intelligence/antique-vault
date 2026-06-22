@@ -18,7 +18,7 @@ export default function SellStepComplete({ tracking, valuation, form, onReset }:
       </div>
       <h2 className="text-2xl font-semibold mb-2">Shipment submitted</h2>
       <p className="text-zinc-500 mb-8 max-w-sm mx-auto">
-        Your device is on its way to the vault. Once received, your token will be minted and appear in your portfolio.
+        Your item is on its way to our warehouse. Once received, your token will be minted and appear in your portfolio.
       </p>
 
       <div className="ios-inset text-left mb-8 text-sm space-y-3">
@@ -45,7 +45,7 @@ export default function SellStepComplete({ tracking, valuation, form, onReset }:
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
-        <Link href="/" className="btn-secondary">View vault</Link>
+        <Link href="/" className="btn-secondary">View portfolio</Link>
         <Link href="/market" className="btn-secondary">Browse market</Link>
         <button type="button" onClick={onReset} className="btn-primary">
           Sell another device

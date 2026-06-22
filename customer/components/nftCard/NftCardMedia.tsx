@@ -69,7 +69,7 @@ const NftCardMedia = React.memo(function NftCardMedia({
           <span className="quantum-badge text-red-400 border-red-900/40">REDEEMED</span>
         ) : (
           <span className="quantum-badge text-[#22ffaa] border-[#22ffaa]/30">
-            VAULTED • {derived.workingStatus}
+            STORED • {derived.workingStatus}
           </span>
         )}
       </div>

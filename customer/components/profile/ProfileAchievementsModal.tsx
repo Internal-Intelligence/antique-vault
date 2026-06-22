@@ -29,7 +29,7 @@ export default function ProfileAchievementsModal({
       <IosModal onClose={onClose}>
         <div>
           <h2 className="text-xl font-semibold tracking-tight mb-1">All achievements</h2>
-          <p className="text-sm text-zinc-500 mb-5">Earn badges through selling, bidding, and vault activity.</p>
+          <p className="text-sm text-zinc-500 mb-5">Earn badges through selling, bidding, and marketplace activity.</p>
           <div className="grid grid-cols-2 gap-2 max-h-[60vh] overflow-y-auto pr-1">
             {badges.map((badge) => {
               const unlocked = isUnlocked(badge.id);

@@ -16,7 +16,7 @@ const ACQ_PROGRAM_ID = new PublicKey(
 );
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ACQUIRE — Community funds the next wave of AI-valued e-waste
+// ACQUIRE — Community funds inventory acquisition rounds
 // Units give skin in the game + priority on fresh inventory
 // ═══════════════════════════════════════════════════════════════════════════
 // Minimal IDL — customer only needs buyUnits

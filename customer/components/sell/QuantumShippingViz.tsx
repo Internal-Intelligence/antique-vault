@@ -263,7 +263,7 @@ function ShippingVizCanvas({
         </mesh>
         <Html position={[0, 1.4, 0]} style={{ pointerEvents: "none" }}>
           <div className="text-[9px] text-center font-mono text-emerald-400 tracking-[1px] whitespace-nowrap">
-            NFTBAY VAULT
+            NFTBAY WAREHOUSE
             <br />
             AUSTIN, TX
           </div>
@@ -342,8 +342,8 @@ export default function QuantumShippingViz({ animating, optimizedIndex, shipAddr
     return (
       <div className="h-80 w-full ios-card flex items-center justify-center">
         <div className="text-center">
-          <div className="text-[#22ffaa] text-xs tracking-[3px] mb-1">QUANTUM 3D LOADING</div>
-          <div className="animate-pulse text-white/60 text-[10px]">INITIALIZING PRIMITIVES • PATHS • CARRIERS</div>
+          <div className="text-[#22ffaa] text-xs tracking-[3px] mb-1">Loading route map</div>
+          <div className="animate-pulse text-white/60 text-[10px]">Preparing carriers and delivery paths</div>
         </div>
       </div>
     );
@@ -353,10 +353,10 @@ export default function QuantumShippingViz({ animating, optimizedIndex, shipAddr
     <div className="relative h-80 w-full ios-card overflow-hidden">
       <ShippingVizCanvas animating={animating} optimizedIndex={optimizedIndex} shipAddress={shipAddress} />
       <div className="absolute top-2 left-2 text-[9px] px-2.5 py-0.5 rounded bg-black/70 border border-white/20 text-white/70 tracking-[1.5px] pointer-events-none">
-        QUANTUM 3D • PRIMITIVES • ANIM LINES
+        Route map • live tracking demo
       </div>
       <div className="absolute top-2 right-2 text-[9px] px-2 py-0.5 bg-emerald-950/70 border border-emerald-500/40 text-emerald-400 text-[8px] tracking-widest pointer-events-none">
-        VAULT: AUSTIN TX
+        Warehouse: Austin, TX
       </div>
     </div>
   );

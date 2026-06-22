@@ -1,9 +1,9 @@
 import Link from "next/link";
-import type { ActivityItem, PrestigeBadgeDef } from "./types";
+import type { ActivityItem, PrestigeBadgeDef, ProfileNextAction } from "./types";
 
 interface ProfileOverviewProps {
   activities: ActivityItem[];
-  nextAction: { title: string; desc: string; href: string; cta: string };
+  nextAction: ProfileNextAction;
   topBadges: PrestigeBadgeDef[];
   unlockedCount: number;
   onOpenBadge: (badge: PrestigeBadgeDef) => void;
@@ -32,9 +32,15 @@ export default function ProfileOverview({
         <p className="profile-card__eyebrow">Recommended next step</p>
         <h2 className="profile-card__title">{nextAction.title}</h2>
         <p className="profile-card__body">{nextAction.desc}</p>
-        <Link href={nextAction.href} className="btn-primary mt-4 w-full sm:w-auto">
-          {nextAction.cta}
-        </Link>
+        {nextAction.onClick ? (
+          <button type="button" onClick={nextAction.onClick} className="btn-primary mt-4 w-full sm:w-auto">
+            {nextAction.cta}
+          </button>
+        ) : (
+          <Link href={nextAction.href} className="btn-primary mt-4 w-full sm:w-auto">
+            {nextAction.cta}
+          </Link>
+        )}
       </section>
 
       <section className="profile-card">
@@ -97,11 +103,15 @@ export default function ProfileOverview({
           <span className="profile-quick-link__arrow">→</span>
         </Link>
         <Link href="/" className="profile-quick-link">
-          <span className="profile-quick-link__label">Manage vault</span>
+          <span className="profile-quick-link__label">My inventory</span>
           <span className="profile-quick-link__arrow">→</span>
         </Link>
         <Link href="/fees" className="profile-quick-link">
           <span className="profile-quick-link__label">Fee schedule</span>
+          <span className="profile-quick-link__arrow">→</span>
+        </Link>
+        <Link href="/profile?tab=expand" className="profile-quick-link">
+          <span className="profile-quick-link__label">Grow income</span>
           <span className="profile-quick-link__arrow">→</span>
         </Link>
       </section>

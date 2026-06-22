@@ -1,5 +1,20 @@
 export type ProfileTab = "overview" | "inventory" | "earn" | "expand";
 
+export const PROFILE_TABS: ProfileTab[] = ["overview", "inventory", "earn", "expand"];
+
+export function parseProfileTab(value: string | string[] | undefined): ProfileTab | null {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return raw && PROFILE_TABS.includes(raw as ProfileTab) ? (raw as ProfileTab) : null;
+}
+
+export interface ProfileNextAction {
+  title: string;
+  desc: string;
+  href: string;
+  cta: string;
+  onClick?: () => void;
+}
+
 export interface PrestigeBadgeDef {
   id: string;
   name: string;

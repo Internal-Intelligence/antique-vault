@@ -24,6 +24,8 @@ function NftCardInner({
   mode = "portfolio",
   onStore,
   onList,
+  onBuy,
+  buying = false,
   showActions = true,
 }: NftCardProps) {
   const router = useRouter();
@@ -95,7 +97,14 @@ function NftCardInner({
           />
         )}
         {showActions && !derived.isRedeemed && (
-          <NftCardActions item={item} mode={mode} onStore={onStore} onList={onList} />
+          <NftCardActions
+            item={item}
+            mode={mode}
+            onStore={onStore}
+            onList={onList}
+            onBuy={onBuy}
+            buying={buying}
+          />
         )}
         {derived.isRedeemed && mode === "portfolio" && (
           <p className="text-center text-[10px] text-gray-500 py-1 tracking-wide">

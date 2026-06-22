@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -9,38 +10,16 @@ import { getProgram } from "../lib/anchor";
 import { fetchOwnedVaultItems, VaultItem } from "../lib/fetchOwnedItems";
 import { getNeurochipBoosterDecision } from "../lib/quantum";
 import FeeDisclosure from "../components/FeeDisclosure";
-import { getNftBayProgram, createNftBayListing, getSellerNftAta } from "../lib/nftbay";
+import { PRESTIGE_DEFS, type PrestigeBadgeDef } from "../components/profile";
+import { getNftBayProgram, createNftBayListing, getSellerNftAta, getPlatformFeeRecipient } from "../lib/nftbay";
 import { PublicKey } from "@solana/web3.js";
 import { requireIdVerification } from "../lib/anchor";
 import { BN } from "@coral-xyz/anchor";
 
 type Modal = "store" | "list" | null;
 
-interface PrestigeBadgeDef {
-  id: string;
-  name: string;
-  icon: string;
-  detail: string;
-  how: string;
-  points: number;
-}
-
-const PRESTIGE_DEFS: PrestigeBadgeDef[] = [
-  { id: "verified-commander", name: "Verified Seller", icon: "🛡️", detail: "Successfully verified your identity and wallet. The foundation of trust in the vault.", how: "Complete ID verification in your account settings or first high-value action.", points: 120 },
-  { id: "pawn-legend", name: "Pawn Legend", icon: "♟️", detail: "Legendary status in the pawn ecosystem. You've moved serious hardware through the vault.", how: "Pawn 5+ devices into the vault. Each successful pawn adds to your legend.", points: 150 },
-  { id: "auction-master", name: "Auction Master", icon: "🏛️", detail: "Master of the live auction floor. Won or sold in high-stakes NFTBAY auctions.", how: "Win or successfully close 3+ live auctions on the marketplace.", points: 180 },
-  { id: "live-bidder", name: "Live Bidder", icon: "⚡", detail: "Fearless live bidder. You thrive in the fast-paced, real-time auction battles.", how: "Place 10 successful live bids across auctions. Speed and courage count.", points: 90 },
-  { id: "shipping-pro", name: "Shipping Pro", icon: "📦", detail: "Proven logistics expert. Your shipments arrive fast and flawless every time.", how: "Complete 3+ shipping flows with on-time simulated deliveries.", points: 110 },
-  { id: "promoted-seller", name: "Promoted Seller", icon: "📈", detail: "Used promoted listings to reach more buyers. Your items get extra visibility in search.", how: "List your first promoted listing on NFTBAY.", points: 140 },
-  { id: "top-collector", name: "Top Collector", icon: "💎", detail: "Elite collector. Your vault holds rare and high-value tokenized assets.", how: "Accumulate 8+ high-value items in your vault collection.", points: 200 },
-  { id: "social-influencer", name: "Social Influencer", icon: "📣", detail: "Prestige amplifier. Your shares drive new commanders into the ecosystem.", how: "Share 5+ badges or successful sales publicly (demo share counts).", points: 75 },
-  { id: "first-sale", name: "First Sale", icon: "💰", detail: "Made history with your very first sale. The start of your commander journey.", how: "Complete your first successful listing + sale on the marketplace.", points: 80 },
-  { id: "loyal-commander", name: "Loyal Commander", icon: "⭐", detail: "Unwavering loyalty. You've been a core member of the NFTBAY vault community.", how: "Stay active for 30+ days with repeated vault interactions.", points: 130 },
-  { id: "quantum-pioneer", name: "Power Seller", icon: "⭐", detail: "Consistent high-volume seller. AI pricing tools and smart listings power your edge.", how: "Use the AI pricing assistant 5+ times and maintain active listings.", points: 95 },
-  { id: "golden-loop-legend", name: "Golden Loop Legend", icon: "🏆", detail: "Ultimate prestige. You've built a thriving seller portfolio and maximized marketplace activity.", how: "Reach high total portfolio value with multiple active listings and completed sales.", points: 220 },
-];
-
 export default function Portfolio() {
+  const router = useRouter();
   const { connection } = useConnection();
   const wallet = useWallet();
   const [items, setItems] = useState<VaultItem[]>([]);
@@ -53,6 +32,7 @@ export default function Portfolio() {
   const [selectedBoosterBps, setSelectedBoosterBps] = useState(420); // default from neuro
   const [selectedOwnerFeeBps, setSelectedOwnerFeeBps] = useState(500); // Production: 5% platform fee (0.5%-8% on-chain)
   const [listingStatus, setListingStatus] = useState("");
+  const pendingListBoost = useRef(false);
 
   // === PRESTIGE & ACHIEVEMENTS: 12 beautiful badges, emotional core ===
   const [unlockedBadges, setUnlockedBadges] = useState<Set<string>>(new Set([
@@ -92,15 +72,28 @@ export default function Portfolio() {
     setModal("list");
   }
 
+  useEffect(() => {
+    if (!router.isReady || router.query.action !== "list" || items.length === 0) return;
+
+    const inVault = items.find((i) => i.status === 0) ?? items[0];
+    openList(inVault);
+
+    if (router.query.boost === "1") pendingListBoost.current = true;
+
+    router.replace("/", undefined, { shallow: true });
+  }, [router.isReady, router.query.action, router.query.boost, items]);
+
   // Neurochip live decision when opening list modal (optimizes x% for golden loop volume/revenue)
   useEffect(() => {
     if (listItem && modal === "list") {
       const priceApprox = (listItem.appraisedValueUsdCents || 4500) * 100000; // rough lamports proxy
       const dec = getNeurochipBoosterDecision(priceApprox, listItem.category || "General", 0.55, items.length);
+      const boosted = pendingListBoost.current;
       setNeuroDecision(dec);
       setSelectedBoosterBps(Math.floor(dec.xPct * 10000));
-      setSelectedOwnerFeeBps(dec.ownerFeeBps);
-      setListingStatus("");
+      setSelectedOwnerFeeBps(boosted ? 800 : dec.ownerFeeBps);
+      setListingStatus(boosted ? "Boost mode — promoted 8% fee selected" : "");
+      pendingListBoost.current = false;
     }
   }, [listItem, modal, items.length]);
 
@@ -199,13 +192,13 @@ export default function Portfolio() {
           <p className="text-sm font-medium text-emerald-400/90 mb-3">Solana · Real-world assets</p>
           <h1 className="page-title">The marketplace for real-world assets</h1>
           <p className="page-subtitle mx-auto mb-8">
-            Buy and sell physical goods on Solana. List, pawn, auction, or redeem — crypto-native commerce built for normies and degens alike.
+            Buy and sell physical goods on Solana. List, pawn, auction, or redeem — a crypto-native marketplace built for everyday buyers and sellers.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
             <Link href="/sell" className="btn-primary w-full sm:w-auto">Start selling</Link>
             <Link href="/market" className="btn-secondary w-full sm:w-auto">Browse market</Link>
           </div>
-          <p className="text-sm text-zinc-600">Connect your wallet to view your vault</p>
+          <p className="text-sm text-zinc-600">Connect your wallet to view your portfolio</p>
         </div>
       ) : loading ? (
         <div className="flex items-center justify-center py-32">
@@ -218,7 +211,7 @@ export default function Portfolio() {
             <div className="grid grid-cols-3 gap-3 mb-10">
               {[
                 { label: "Items", value: String(items.length) },
-                { label: "In vault", value: String(inVault), accent: "green" as const },
+                { label: "In storage", value: String(inVault), accent: "green" as const },
                 {
                   label: "Est. value",
                   value: totalValue.toLocaleString("en-US", {
@@ -337,12 +330,12 @@ export default function Portfolio() {
             <div className="mt-4 px-1">
               <div className="uppercase tracking-[1px] text-[10px] text-gray-500 mb-1.5">HOW TO EARN MORE PRESTIGE</div>
               <div className="text-[12px] text-gray-400 leading-snug grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-0.5">
-                <div>• Pawn more devices → Pawn Legend</div>
+                <div>• Pawn more items → Pawn Pro</div>
                 <div>• Win auctions &amp; list promoted → Auction Master + Promoted Seller</div>
-                <div>• Ship hardware flawlessly → Shipping Pro</div>
+                <div>• Ship items on time → Shipping Pro</div>
                 <div>• Bid live frequently → Live Bidder</div>
-                <div>• Grow vault holdings → Top Collector</div>
-                <div>• Use AI tools &amp; share often → Power Seller + Social Influencer</div>
+                <div>• Grow your inventory → Top Collector</div>
+                <div>• Use AI tools &amp; share often → Power Seller + Referral Driver</div>
               </div>
               <div className="text-[10px] text-amber-400/60 mt-2">Prestige powers social status and future seller perks.</div>
             </div>
@@ -364,14 +357,14 @@ export default function Portfolio() {
             <div className="text-center py-20 text-gray-600">
               <p className="text-lg mb-2">No tokenized assets yet</p>
               <p className="text-sm">
-                List your first item or explore mail-in e-waste from your profile.
+                List your first item on the marketplace, or explore mail-in recycling from your profile.
               </p>
               <Link href="/sell" className="text-emerald-400 hover:underline text-sm">List an item →</Link>
             </div>
           ) : (
             <>
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-semibold">Your vault</h2>
+                <h2 className="text-lg font-semibold">Your inventory</h2>
                 <button
                   onClick={loadItems}
                   className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
@@ -408,7 +401,7 @@ export default function Portfolio() {
                 </div>
               ))}
             </div>
-            <p className="text-center text-[10px] text-gray-600 mt-4">Physical goods only. Mail-in e-waste recycling available in your profile.</p>
+            <p className="text-center text-[10px] text-gray-600 mt-4">Physical goods only. Optional mail-in recycling is available in your profile.</p>
           </div>
         </>
       )}
@@ -514,7 +507,7 @@ export default function Portfolio() {
                     isPromoted,
                     listItem.category || "General",
                     selectedOwnerFeeBps,
-                    PublicKey.default,
+                    getPlatformFeeRecipient() ?? PublicKey.default,
                     selectedBoosterBps,
                     0,
                     neuroDecision?.neuroScore || 78
@@ -563,7 +556,7 @@ export default function Portfolio() {
                 onClick={() => shareBadge(selectedBadge)}
                 className="casino-btn w-full bg-gradient-to-b from-[#ffd700] to-[#e6b800] text-black font-bold active:scale-[0.985]"
               >
-                📤 SHARE THIS BADGE
+                Share badge
               </button>
             ) : (
               <button
@@ -572,11 +565,11 @@ export default function Portfolio() {
                 }}
                 className="casino-btn w-full bg-emerald-500 text-black font-bold"
               >
-                SIMULATE PROGRESS +28% (DEMO)
+                Track progress (demo)
               </button>
             )}
 
-            <div className="text-[10px] text-gray-500 mt-3">Prestige is permanent. Share to flex on social.</div>
+            <div className="text-[10px] text-gray-500 mt-3">Achievements stay on your profile. Share to highlight your seller reputation.</div>
             <button onClick={() => setSelectedBadge(null)} className="mt-4 text-xs text-gray-400 underline">Close</button>
           </div>
         </IosModal>

@@ -18,6 +18,12 @@ export interface NftCardItem {
   isPawned?: boolean;
   aiOfferValueCents?: number;
   trustChainHash?: string;
+  /** NFTBAY listing PDA — required for on-chain buy. */
+  listingPda?: string;
+  priceLamports?: number;
+  priceUsd?: number;
+  listingType?: number;
+  isVaultOnly?: boolean;
 }
 
 export interface NftCardProps {
@@ -26,6 +32,8 @@ export interface NftCardProps {
   onStore?: () => void;
   onList?: () => void;
   onRedeem?: () => void;
+  onBuy?: () => void;
+  buying?: boolean;
   showActions?: boolean;
 }
 

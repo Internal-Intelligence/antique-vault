@@ -26,14 +26,14 @@ export default function SellStepForm({
     <div className="ios-flow-panel p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <div className="uppercase text-emerald-400 text-xs tracking-[2px] mb-1">QUANTUM INTELLIGENCE</div>
-          <h2 className="text-xl font-semibold">Answer the Bubble Questions</h2>
+          <div className="uppercase text-emerald-400 text-xs tracking-[2px] mb-1">AI listing assistant</div>
+          <h2 className="text-xl font-semibold">Tell us about your item</h2>
         </div>
         <button
           onClick={runQuantumAutoDetect}
           className="text-xs px-4 py-1.5 rounded-full border border-[#22ffaa]/40 hover:bg-[#22ffaa]/10 active:bg-[#22ffaa]/20 text-[#22ffaa]"
         >
-          📸 RUN QUANTUM AUTO-DETECT
+          Auto-detect category
         </button>
       </div>
 
@@ -46,7 +46,9 @@ export default function SellStepForm({
       <div className="space-y-5">
         {bubbleQuestions.map((bq, idx) => (
           <div key={idx}>
-            <div className="text-sm text-gray-400 mb-2">💬 {bq.q}</div>
+            <div className="text-sm text-gray-400 mb-2">
+              {bq.q.replace(/e-waste device/i, "item").replace(/vault/i, "warehouse")}
+            </div>
             <div className="flex flex-wrap gap-2">
               {bq.options.map((opt, i) => {
                 const active = bubbleAnswers[bq.key] === opt;
@@ -132,10 +134,10 @@ export default function SellStepForm({
         disabled={!form.deviceName.trim()}
         className="mt-6 w-full py-3.5 rounded-2xl bg-emerald-500 text-black font-bold disabled:bg-gray-800 disabled:text-gray-500 active:bg-emerald-400"
       >
-        SEE QUANTUM AI VALUATION →
+        Get AI valuation →
       </button>
       <p className="text-[10px] text-center text-gray-600 mt-2">
-        All offers use predictive model. Always pennies-on-the-dollar for sustainable RWA.
+        Offers are based on condition, demand, and comparable sales. Final price confirmed before you ship.
       </p>
     </div>
   );

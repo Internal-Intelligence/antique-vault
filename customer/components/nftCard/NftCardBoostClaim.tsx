@@ -26,7 +26,7 @@ const NftCardBoostClaim = React.memo(function NftCardBoostClaim({
         CLAIM {boostPercent}% BOOSTER SHARE
       </button>
       <p className="text-center text-[7px] text-amber-400/70 mt-0.5 tracking-wider">
-        Golden loop active
+        Promotion active
       </p>
     </div>
   );

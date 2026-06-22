@@ -114,7 +114,7 @@ export default function SellStepValuation({
                   }
                   className="mr-1.5 mb-1 text-xs px-2 py-0.5 bg-[#112a1f] border border-violet-400/40 hover:border-violet-400 rounded text-violet-300"
                 >
-                  {b.q}
+                  {b.q.replace(/golden loop/gi, "repeat sales").replace(/amplitude/gi, "promotion level").replace(/Collapse which/gi, "Which")}
                 </button>
               ));
           } catch {

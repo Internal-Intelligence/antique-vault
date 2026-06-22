@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { IncomeAvenue } from "./types";
 
 interface ProfileExpandProps {
   avenues: IncomeAvenue[];
+  initialExpandedId?: string | null;
   onAvenueAction: (avenue: IncomeAvenue) => void;
 }
 
@@ -12,8 +13,16 @@ const STATUS_LABEL: Record<IncomeAvenue["status"], string> = {
   soon: "Soon",
 };
 
-export default function ProfileExpand({ avenues, onAvenueAction }: ProfileExpandProps) {
-  const [expanded, setExpanded] = useState<string | null>(null);
+export default function ProfileExpand({
+  avenues,
+  initialExpandedId = null,
+  onAvenueAction,
+}: ProfileExpandProps) {
+  const [expanded, setExpanded] = useState<string | null>(initialExpandedId);
+
+  useEffect(() => {
+    if (initialExpandedId) setExpanded(initialExpandedId);
+  }, [initialExpandedId]);
 
   return (
     <div className="profile-expand">

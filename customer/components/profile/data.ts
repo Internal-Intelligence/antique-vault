@@ -2,7 +2,7 @@ import type { ActivityItem, IncomeAvenue, PrestigeBadgeDef } from "./types";
 
 export const PRESTIGE_DEFS: PrestigeBadgeDef[] = [
   { id: "verified-commander", name: "Verified Seller", icon: "🛡️", detail: "Identity and wallet verified — buyers trust your listings.", how: "Complete ID verification on your first high-value action.", points: 120 },
-  { id: "pawn-legend", name: "Pawn Legend", icon: "♟️", detail: "You've moved serious hardware through the vault pawn flow.", how: "Pawn 5+ devices into the vault.", points: 150 },
+  { id: "pawn-legend", name: "Pawn Pro", icon: "♟️", detail: "You've completed multiple pawn transactions through NFTBAY custody.", how: "Pawn 5+ items through the marketplace.", points: 150 },
   { id: "auction-master", name: "Auction Master", icon: "🏛️", detail: "Won or closed high-stakes NFTBAY auctions.", how: "Win or close 3+ live auctions.", points: 180 },
   { id: "live-bidder", name: "Live Bidder", icon: "⚡", detail: "Active in real-time auction bidding.", how: "Place 10 successful live bids.", points: 90 },
   { id: "shipping-pro", name: "Shipping Pro", icon: "📦", detail: "Flawless shipping track record.", how: "Complete 3+ on-time shipping flows.", points: 110 },
