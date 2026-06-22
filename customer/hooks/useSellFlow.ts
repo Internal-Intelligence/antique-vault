@@ -36,6 +36,9 @@ export interface SellFlowActions {
   applyGrokRec: () => void;
   handleNeuroDecide: (currentOffer?: number) => void;
   goToValuation: () => void;
+  startFlashcards: () => void;
+  completeFlashcards: () => void;
+  backToLanding: () => void;
   /** Alias used by SellStepForm */
   onContinue: () => void;
   goBackToForm: () => void;
@@ -71,7 +74,7 @@ export function useSellFlow(): UseSellFlowReturn {
   const [form, setForm] = useState<PawnForm>(DEFAULT_FORM);
   const [valuation, setValuation] = useState<Valuation | null>(null);
   const [showVal, setShowVal] = useState(false);
-  const [pawnStep, setPawnStep] = useState<PawnStep>("form");
+  const [pawnStep, setPawnStep] = useState<PawnStep>("landing");
   const [shippingProgress, setShippingProgress] = useState(0);
   const [currentShipStep, setCurrentShipStep] = useState(0);
   const [tracking, setTracking] = useState("");
@@ -90,6 +93,7 @@ export function useSellFlow(): UseSellFlowReturn {
 
   useEffect(() => {
     if (!router.isReady || router.query.program !== "ewaste-mailin") return;
+    setPawnStep("flashcards");
     setForm((prev) => ({
       ...prev,
       category: "Other E-Waste",
@@ -287,12 +291,25 @@ export function useSellFlow(): UseSellFlowReturn {
     }, 680);
   }, [shipAddress]);
 
+  const startFlashcards = useCallback(() => {
+    setPawnStep("flashcards");
+    setBubbleAnswers({});
+  }, []);
+
+  const completeFlashcards = useCallback(() => {
+    setPawnStep("form");
+  }, []);
+
+  const backToLanding = useCallback(() => {
+    setPawnStep("landing");
+  }, []);
+
   const resetAll = useCallback(() => {
     setForm(DEFAULT_FORM);
     setBubbleAnswers({});
     setValuation(null);
     setShowVal(false);
-    setPawnStep("form");
+    setPawnStep("landing");
     setShippingProgress(0);
     setCurrentShipStep(0);
     setTracking("");
@@ -365,6 +382,9 @@ export function useSellFlow(): UseSellFlowReturn {
     applyGrokRec,
     handleNeuroDecide,
     goToValuation,
+    startFlashcards,
+    completeFlashcards,
+    backToLanding,
     onContinue: goToValuation,
     goBackToForm,
     backToForm: goBackToForm,

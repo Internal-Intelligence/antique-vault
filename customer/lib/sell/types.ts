@@ -1,4 +1,4 @@
-export type PawnStep = "form" | "val" | "shipping" | "complete";
+export type PawnStep = "landing" | "flashcards" | "form" | "val" | "shipping" | "complete";
 
 export interface PawnForm {
   deviceName: string;

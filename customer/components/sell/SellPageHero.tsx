@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-export default function SellPageHero() {
+export default function SellPageHero({ compact }: { compact?: boolean }) {
   const router = useRouter();
   const isEwasteMailin = router.query.program === "ewaste-mailin";
 
   return (
-    <div className="mb-10">
+    <div className={compact ? "mb-6" : "mb-6"}>
       <Link href={isEwasteMailin ? "/profile?tab=expand" : "/"} className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">
         ← {isEwasteMailin ? "Back to profile" : "Back to home"}
       </Link>
@@ -20,10 +20,12 @@ export default function SellPageHero() {
         </>
       ) : (
         <>
-          <h1 className="page-title mt-4">List an item</h1>
-          <p className="page-subtitle max-w-lg">
-            Tokenize anything physical — phones, collectibles, gear, and more. AI valuation, vault custody, trade on the marketplace or redeem.
-          </p>
+          <h1 className={`${compact ? "text-2xl" : "page-title"} mt-4`}>Sell on NFTBAY</h1>
+          {!compact && (
+            <p className="page-subtitle max-w-lg">
+              Tap Sell for quick flashcards — then watch recently sold items fly while auctions go live soon.
+            </p>
+          )}
         </>
       )}
     </div>

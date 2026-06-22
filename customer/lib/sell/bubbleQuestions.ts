@@ -1,4 +1,3 @@
-import { CATEGORIES } from "../anchor";
 import type { BubbleQuestion, PawnForm } from "./types";
 
 export function createBubbleQuestions(
@@ -6,19 +5,34 @@ export function createBubbleQuestions(
 ): BubbleQuestion[] {
   return [
     {
-      q: "What kind of e-waste device?",
+      q: "What are you selling?",
       key: "cat",
-      options: CATEGORIES,
-      onSelect: (val: string) => updateForm("category", val),
+      options: [
+        "Smartphones",
+        "Laptops",
+        "Tablets & E-Readers",
+        "Headphones & Audio",
+        "Wearables",
+        "Handheld Gaming",
+        "Cameras & Photo",
+        "Other",
+      ],
+      onSelect: (val: string) => updateForm("category", val === "Other" ? "Other" : val),
     },
     {
-      q: "Is the device WORKING or NON-WORKING?",
+      q: "Does it power on and work?",
       key: "working",
-      options: ["WORKING", "NON-WORKING"],
-      onSelect: (val: string) => updateForm("isWorking", val === "WORKING"),
+      options: ["Yes — fully working", "Mostly — minor issues", "No — parts / dead"],
+      onSelect: (val: string) => {
+        const working = val.startsWith("Yes");
+        updateForm("isWorking", working);
+        if (val.startsWith("No")) updateForm("condition", 0);
+        else if (val.startsWith("Mostly")) updateForm("condition", 2);
+        else updateForm("condition", 4);
+      },
     },
     {
-      q: "Describe the physical condition (pick closest)",
+      q: "How's the physical condition?",
       key: "cond",
       options: [
         "Powers on perfectly",
@@ -42,7 +56,7 @@ export function createBubbleQuestions(
       },
     },
     {
-      q: "Approx weight (must be <15 lbs for vault)",
+      q: "Roughly how heavy is it?",
       key: "wt",
       options: ["<1 lb", "1-3 lbs", "3-6 lbs", "6-10 lbs", "10-14.9 lbs"],
       onSelect: (val: string) => {

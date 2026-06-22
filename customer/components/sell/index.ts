@@ -1,5 +1,9 @@
 export { default as SellPageHero } from "./SellPageHero";
 export { default as SellWorkingToggle } from "./SellWorkingToggle";
+export { default as SellFlashcards } from "./SellFlashcards";
+export { default as SellRecentlySold } from "./SellRecentlySold";
+export { default as SellAuctionsPreview } from "./SellAuctionsPreview";
+export { default as SellStartCTA } from "./SellStartCTA";
 export { default as SellStepForm } from "./SellStepForm";
 export { default as SellStepValuation } from "./SellStepValuation";
 export { default as SellStepShipping } from "./SellStepShipping";
