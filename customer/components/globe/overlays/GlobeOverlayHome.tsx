@@ -5,32 +5,33 @@ import {
 
 type Props = {
   activity: GlobeActivityEvent;
+  interactive?: boolean;
 };
 
-export default function GlobeOverlayHome({ activity }: Props) {
+export default function GlobeOverlayHome({ activity, interactive = false }: Props) {
   return (
-    <div className="home-globe-overlay" aria-hidden>
-      <div className="home-globe-overlay__top">
-        <div className="home-globe-panel home-globe-panel--status">
+    <div className="home-globe-overlay" aria-hidden={!interactive}>
+      <div className="home-globe-panel home-globe-panel--compact">
+        <div className="home-globe-panel__row">
           <span className="home-globe-live">
             <span className="home-globe-live__pulse" />
-            Live network
+            Live
           </span>
-          <p className="home-globe-activity" aria-live="polite">
-            <span className="home-globe-activity__who">{activity.who}</span> {activity.action}{" "}
-            <span className="home-globe-activity__item">{activity.item}</span>
-            <span className="home-globe-activity__ago"> · {activity.ago} ago</span>
-          </p>
-        </div>
-
-        <div className="home-globe-stats">
           <span className="home-globe-stat">{GLOBE_NETWORK_STATS.activeBuyers} active</span>
           <span className="home-globe-stat">{GLOBE_NETWORK_STATS.inTransit} in transit</span>
-          <span className="home-globe-stat home-globe-stat--vault">{GLOBE_NETWORK_STATS.vaultLabel}</span>
         </div>
+        <p className="home-globe-activity" aria-live="polite">
+          <span className="home-globe-activity__who">{activity.who}</span> {activity.action}{" "}
+          <span className="home-globe-activity__item">{activity.item}</span>
+          <span className="home-globe-activity__ago"> · {activity.ago}</span>
+        </p>
       </div>
 
-      <p className="home-globe-hint">Drag to explore · Real gear moving through the mesh</p>
+      {interactive ? (
+        <p className="home-globe-hint">Drag to rotate · Scroll to zoom</p>
+      ) : (
+        <p className="home-globe-hint home-globe-hint--idle">Gear moving through the vault mesh</p>
+      )}
     </div>
   );
 }

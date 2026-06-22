@@ -730,10 +730,12 @@ function GlobeCameraControls({
   animating,
   mode,
   focusPoint,
+  controlsEnabled = true,
 }: {
   animating: boolean;
   mode: ShippingGlobeMode;
   focusPoint: THREE.Vector3 | null;
+  controlsEnabled?: boolean;
 }) {
   const controlsRef = useRef<OrbitControlsImpl>(null!);
   const [autoRotate, setAutoRotate] = useState(true);
@@ -762,7 +764,14 @@ function GlobeCameraControls({
     const interacting = !autoRotate;
     const home = new THREE.Vector3(0, 0, 0);
 
-    const focus = focusPoint ?? (mode === "sell" && animating ? US_FOCUS_POINT : null);
+    const focus =
+      mode === "home"
+        ? controlsEnabled
+          ? focusPoint
+          : null
+        : animating
+          ? US_FOCUS_POINT
+          : null;
 
     if (focus && !interacting) {
       controls.target.lerp(focus, delta * (mode === "home" ? 0.65 : 0.45));
@@ -780,6 +789,7 @@ function GlobeCameraControls({
   return (
     <OrbitControls
       ref={controlsRef}
+      enabled={controlsEnabled}
       enableDamping
       dampingFactor={0.08}
       enablePan={false}
@@ -1027,6 +1037,7 @@ function ShippingGlobeCanvas({
   sceneActive,
   focusPoint,
   height,
+  controlsEnabled,
 }: {
   animating: boolean;
   optimizedIndex: number | null;
@@ -1035,8 +1046,12 @@ function ShippingGlobeCanvas({
   sceneActive: boolean;
   focusPoint: THREE.Vector3 | null;
   height: number;
+  controlsEnabled: boolean;
 }) {
   if (!sceneActive) return null;
+
+  const isHome = mode === "home";
+  const pointerEvents = isHome && !controlsEnabled ? "none" : "auto";
 
   return (
     <Canvas
@@ -1048,10 +1063,19 @@ function ShippingGlobeCanvas({
         toneMapping: THREE.ACESFilmicToneMapping,
         toneMappingExposure: mode === "home" ? 1.22 : 1.15,
       }}
-      dpr={mode === "home" ? [1, 1.35] : [1, 1.5]}
-      style={{ touchAction: "none", height }}
+      dpr={mode === "home" ? [1, 1.25] : [1, 1.5]}
+      style={{
+        height,
+        pointerEvents,
+        touchAction: isHome && !controlsEnabled ? "pan-y" : "none",
+      }}
     >
-      <GlobeCameraControls animating={animating} mode={mode} focusPoint={focusPoint} />
+      <GlobeCameraControls
+        animating={animating}
+        mode={mode}
+        focusPoint={focusPoint}
+        controlsEnabled={controlsEnabled}
+      />
       <LiveGlobeScene
         animating={animating}
         optimizedIndex={optimizedIndex}
@@ -1078,9 +1102,15 @@ export default function ShippingGlobe({
   const buyers = useMemo(() => (isHome ? mergeLiveBuyersWithFeed() : LIVE_BUYERS), [isHome]);
   const activityFeed = useMemo(() => buildGlobeActivityFeed(), []);
   const [activityIdx, setActivityIdx] = useState(0);
+  const [interactive, setInteractive] = useState(false);
   const effectiveAnimating = isHome ? !reducedMotion && active : animating;
+  const controlsEnabled = !isHome || interactive;
 
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!active) setInteractive(false);
+  }, [active]);
 
   useEffect(() => {
     if (!isHome || reducedMotion) return;
@@ -1150,17 +1180,35 @@ export default function ShippingGlobe({
       role="img"
       aria-label="NFTBAY live shipping network globe"
     >
-      <ShippingGlobeCanvas
-        animating={effectiveAnimating}
-        optimizedIndex={optimizedIndex}
-        mode={mode}
-        buyers={buyers}
-        sceneActive={active}
-        focusPoint={focusPoint}
-        height={height}
-      />
+      <div
+        className={`absolute inset-0 ${isHome && !interactive ? "pointer-events-none" : ""}`}
+        aria-hidden={isHome && !interactive}
+      >
+        <ShippingGlobeCanvas
+          animating={effectiveAnimating}
+          optimizedIndex={optimizedIndex}
+          mode={mode}
+          buyers={buyers}
+          sceneActive={active}
+          focusPoint={focusPoint}
+          height={height}
+          controlsEnabled={controlsEnabled}
+        />
+      </div>
+
+      {isHome && !interactive && (
+        <button
+          type="button"
+          className="home-globe-tap-gate"
+          onClick={() => setInteractive(true)}
+          aria-label="Click to explore the live shipping globe"
+        >
+          <span className="home-globe-tap-gate__pill">Click to explore</span>
+        </button>
+      )}
+
       {isHome ? (
-        <GlobeOverlayHome activity={currentActivity} />
+        <GlobeOverlayHome activity={currentActivity} interactive={interactive} />
       ) : (
         <ShippingGlobeOverlay
           animating={effectiveAnimating}

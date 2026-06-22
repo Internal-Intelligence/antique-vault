@@ -44,11 +44,11 @@ function useReducedMotion() {
 export default function HomeGlobeSection() {
   const { ref, inView } = useGlobeInView();
   const reducedMotion = useReducedMotion();
-  const [height, setHeight] = useState(580);
+  const [height, setHeight] = useState(400);
   const [tabVisible, setTabVisible] = useState(true);
 
   useEffect(() => {
-    const update = () => setHeight(window.innerWidth < 768 ? 420 : 580);
+    const update = () => setHeight(window.innerWidth < 768 ? 280 : 400);
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
@@ -63,7 +63,7 @@ export default function HomeGlobeSection() {
 
   return (
     <div ref={ref} className="home-globe-section-wrap">
-      <HomeSectionReveal className="home-globe-section mb-10" variant="fadeIn" delay={0.06}>
+      <HomeSectionReveal className="home-globe-section mb-7" variant="fadeIn" delay={0.06}>
         <ShippingGlobe
           mode="home"
           active={inView && tabVisible}
