@@ -1,8 +1,9 @@
-import { Connection } from "@solana/web3.js";
+import { Connection, PublicKey } from "@solana/web3.js";
 import {
   DEFAULT_RELIST_DURATION_SECONDS,
   forfeitAndRelist,
   getNftBayReadProgram,
+  settleAuction,
 } from "./nftbay";
 
 /** Scan pending claims past deadline and relist (call from cron or admin). */
@@ -24,6 +25,37 @@ export async function processExpiredAuctionClaims(
   }
 
   return relisted;
+}
+
+/** Settle ended auctions that still have bids (claim window opens). */
+export async function processExpiredAuctionSettles(
+  connection: Connection,
+  signerProgram: any
+): Promise<{ settled: string[]; skipped: { listingPda: string; reason: string }[] }> {
+  const read = getNftBayReadProgram(connection);
+  const all = await read.account.listing.all();
+  const now = Math.floor(Date.now() / 1000);
+  const settled: string[] = [];
+  const skipped: { listingPda: string; reason: string }[] = [];
+
+  for (const { publicKey, account } of all) {
+    if (account.listingType !== 1) continue;
+    if (!account.isActive) continue;
+    if (account.endTime.toNumber() > now) continue;
+    if (account.highestBidder.equals(PublicKey.default)) {
+      skipped.push({ listingPda: publicKey.toString(), reason: "no bids" });
+      continue;
+    }
+    try {
+      await settleAuction(signerProgram, publicKey);
+      settled.push(publicKey.toString());
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "settle failed";
+      skipped.push({ listingPda: publicKey.toString(), reason: msg });
+    }
+  }
+
+  return { settled, skipped };
 }
 
 export async function fetchPendingClaimListings(connection: Connection) {

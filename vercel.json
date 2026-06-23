@@ -3,5 +3,15 @@
   "framework": "nextjs",
   "installCommand": "cd customer && npm install",
   "buildCommand": "cd customer && npm run build",
-  "outputDirectory": "customer/.next"
+  "outputDirectory": "customer/.next",
+  "crons": [
+    {
+      "path": "/api/cron/incentive-bot",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/settle-auctions",
+      "schedule": "*/10 * * * *"
+    }
+  ]
 }

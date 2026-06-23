@@ -1,6 +1,8 @@
+import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import Link from "next/link";
 import { FEE_ALLOCATION } from "../lib/mission";
+import { fetchFeeAllocations } from "../lib/apiClient";
 
 const FEE_ROWS = [
   { name: "Standard sale", rate: "5%", note: "Applied when your item sells at fixed price or auction" },
@@ -10,7 +12,28 @@ const FEE_ROWS = [
   { name: "Booster affiliate", rate: "Up to 12%", note: "Share of sale paid to promoter on boosted listings only" },
 ];
 
+type RecordedAllocation = {
+  period_label: string;
+  pool_type: string;
+  amount_lamports: number;
+  pct: number;
+  note?: string;
+};
+
 export default function FeesPage() {
+  const [recorded, setRecorded] = useState<RecordedAllocation[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    fetchFeeAllocations()
+      .then((data) => {
+        if (data?.recorded?.length) setRecorded(data.recorded);
+      })
+      .finally(() => setLoaded(true));
+  }, []);
+
+  const policy = FEE_ALLOCATION;
+
   return (
     <Layout>
       <div className="max-w-2xl">
@@ -49,7 +72,7 @@ export default function FeesPage() {
             deflationary deals through vault inventory, plus transparent incentive bids on standout listings.
           </p>
           <ul className="space-y-3">
-            {FEE_ALLOCATION.map((row) => (
+            {policy.map((row) => (
               <li key={row.label} className="flex gap-3 text-sm">
                 <span className="text-lg shrink-0" aria-hidden>
                   {row.icon}
@@ -63,6 +86,19 @@ export default function FeesPage() {
               </li>
             ))}
           </ul>
+          {loaded && recorded.length > 0 && (
+            <div className="mt-6 pt-5 border-t border-white/[0.06]">
+              <h3 className="text-sm font-medium text-zinc-300 mb-3">Recorded allocations (Postgres)</h3>
+              <ul className="space-y-2 text-xs text-zinc-500">
+                {recorded.map((row, i) => (
+                  <li key={`${row.period_label}-${row.pool_type}-${i}`}>
+                    {row.period_label} · {row.pool_type}: {(row.amount_lamports / 1e9).toFixed(4)} SOL ({row.pct}%)
+                    {row.note ? ` — ${row.note}` : ""}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <Link href="/mission" className="text-sm text-emerald-500/90 hover:underline mt-5 inline-block">
             Read the full mission →
           </Link>

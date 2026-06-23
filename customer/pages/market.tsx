@@ -8,8 +8,8 @@ import Layout from "../components/Layout";
 import { CONDITIONS, requireIdVerification } from "../lib/anchor";
 import { fetchNftImage } from "../lib/burn";
 import NftCard, { type NftCardItem } from "../components/NftCard";
+import { fetchListings } from "../lib/apiClient";
 import {
-  loadMarketplaceItems,
   executeBuyListing,
   placeAuctionBid,
   getNftBayProgram,
@@ -35,15 +35,17 @@ export default function Marketplace() {
   const [auctionBidding, setAuctionBidding] = useState<string | null>(null);
   const [buyingMint, setBuyingMint] = useState<string | null>(null);
   const [buyError, setBuyError] = useState<string | null>(null);
-  const [listSource, setListSource] = useState<"nftbay" | "vault-fallback">("nftbay");
+  const [listSource, setListSource] = useState<"nftbay" | "vault-fallback" | "api-cache">("nftbay");
 
   const loadListings = useCallback(async () => {
     setLoading(true);
     setBuyError(null);
     try {
-      const items = await loadMarketplaceItems(connection);
+      const { items, source } = await fetchListings(false, connection);
       const hasOnChain = items.some((i) => !i.isVaultOnly);
-      setListSource(hasOnChain ? "nftbay" : "vault-fallback");
+      setListSource(
+        source === "api" ? "api-cache" : hasOnChain ? "nftbay" : "vault-fallback"
+      );
       setListings(items);
       setLoading(false);
 
@@ -69,7 +71,7 @@ export default function Marketplace() {
   const handleBuy = useCallback(
     async (item: MarketplaceItem) => {
       setBuyError(null);
-      requireIdVerification("market-buy-" + item.itemId, "buy-listing");
+      await requireIdVerification("market-buy-" + item.itemId, "buy-listing", wallet.publicKey?.toBase58());
 
       if (!wallet.connected) {
         setBuyError("Connect your wallet to buy on NFTBAY.");
@@ -260,7 +262,11 @@ export default function Marketplace() {
                       </div>
                       <button
                         onClick={async () => {
-                          requireIdVerification("market-auction-" + item.itemId, "place-bid");
+                          await requireIdVerification(
+                            "market-auction-" + item.itemId,
+                            "place-bid",
+                            wallet.publicKey?.toBase58()
+                          );
                           if (!wallet.connected) {
                             alert("Connect wallet to place on-chain bids.");
                             return;

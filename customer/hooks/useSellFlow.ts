@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { CATEGORIES, requireIdVerification, simulateIdVerificationGate, predictEwasteQuantum } from "../lib/anchor";
 import { attemptMailInPawnIntake } from "../lib/nftbay";
+import { createShippingLabel, postIntake, postValuation } from "../lib/apiClient";
 import {
   computeQuantumValuation,
   computeBoostPreview,
@@ -101,6 +102,7 @@ export function useSellFlow(): UseSellFlowReturn {
   const [deviceStatusComplete, setDeviceStatusComplete] = useState(false);
   const [sellMode, setSellMode] = useState<SellMode | null>(null);
   const [intakeBanner, setIntakeBanner] = useState<string | null>(null);
+  const [intakeId, setIntakeId] = useState<string | null>(null);
 
   const val = valuation;
 
@@ -205,10 +207,19 @@ export function useSellFlow(): UseSellFlowReturn {
     }
   }, [form.deviceName, form.description]);
 
-  // Deep AI valuation integration: recompute live on any change
+  // Deep AI valuation: client preview + server persistence when wallet connected
   useEffect(() => {
-    setValuation(computeQuantumValuation(form));
-  }, [form]);
+    const local = computeQuantumValuation(form);
+    setValuation(local);
+    if (!form.deviceName && !form.description) return;
+    const walletPk = wallet.publicKey?.toBase58();
+    const timer = setTimeout(() => {
+      postValuation(form, walletPk)
+        .then((serverVal) => setValuation(serverVal))
+        .catch(() => {});
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [form, wallet.publicKey]);
 
   const applyGrokRec = useCallback(() => {
     const rec = getNeuroGrokRec(form.deviceName, form.category, form.isWorking, form.condition);
@@ -247,7 +258,7 @@ export function useSellFlow(): UseSellFlowReturn {
 
   const acceptPawn = useCallback(async () => {
     if (!valuation) return;
-    requireIdVerification("sell-pawn-" + form.deviceName, "pawn-accept");
+    await requireIdVerification("sell-pawn-" + form.deviceName, "pawn-accept", wallet.publicKey?.toBase58());
     const gate = simulateIdVerificationGate("sell-e-waste", "AI-intake");
     console.log("[QUANTUM AI INTAKE ENHANCED]", gate);
 
@@ -272,20 +283,54 @@ export function useSellFlow(): UseSellFlowReturn {
       );
     }
 
+    let track = "QNTM-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+    try {
+      const apiIntake = await postIntake({
+        walletPubkey: wallet.publicKey?.toBase58(),
+        sellMode: sellMode ?? "intake",
+        deviceName: form.deviceName || form.category,
+        category: form.category,
+        conditionTier: form.condition,
+        isWorking: form.isWorking,
+        weightLbs: form.weightLbs,
+        description: form.description,
+        offerUsdCents: Math.round(valuation.offerUsd * 100),
+        shipFromAddress: address,
+        form,
+      });
+      setIntakeId(apiIntake.ticket?.id ?? null);
+      if (apiIntake.trackingId) track = apiIntake.trackingId;
+    } catch (e) {
+      console.warn("[NFTBAY] Intake API fallback to local tracking", e);
+    }
+
     setPawnStep("shipping");
     setShippingProgress(0);
     setCurrentShipStep(0);
     setIs3DAnimating(true);
     setOptimizedRouteIndex(null);
-    const track = "QNTM-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-QUANTUM";
     setTracking(track);
-  }, [valuation, form.deviceName, form.category, form.isWorking, shipAddress, wallet, connection]);
+  }, [valuation, form, sellMode, shipAddress, wallet, connection]);
 
-  const startShippingSim = useCallback(() => {
+  const startShippingSim = useCallback(async () => {
     if (!shipAddress.trim()) {
-      alert("Enter a ship-from address to start quantum transit sim.");
+      alert("Enter a ship-from address to start shipping.");
       return;
     }
+
+    if (intakeId) {
+      try {
+        const label = await createShippingLabel({
+          intakeId,
+          shipFromAddress: shipAddress,
+          walletPubkey: wallet.publicKey?.toBase58(),
+        });
+        if (label.tracking) setTracking(label.tracking);
+      } catch (e) {
+        console.warn("[NFTBAY] Shipping label API", e);
+      }
+    }
+
     setShippingProgress(5);
     setCurrentShipStep(0);
     setIs3DAnimating(true);
@@ -306,7 +351,7 @@ export function useSellFlow(): UseSellFlowReturn {
         }, 650);
       }
     }, 680);
-  }, [shipAddress]);
+  }, [shipAddress, intakeId, wallet.publicKey]);
 
   const startFlashcards = useCallback(() => {
     setPawnStep("flashcards");
@@ -381,6 +426,7 @@ export function useSellFlow(): UseSellFlowReturn {
     setShowVal(false);
     setSellMode(null);
     setIntakeBanner(null);
+    setIntakeId(null);
     setPawnStep("landing");
     setShippingProgress(0);
     setCurrentShipStep(0);

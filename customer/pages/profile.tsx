@@ -4,6 +4,7 @@ import Layout from "../components/Layout";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { getProgram } from "../lib/anchor";
+import { fetchActivity } from "../lib/apiClient";
 import { fetchOwnedVaultItems, VaultItem } from "../lib/fetchOwnedItems";
 import {
   ProfileHeader,
@@ -17,6 +18,7 @@ import {
   PRESTIGE_DEFS,
   INCOME_AVENUES,
   buildDemoActivity,
+  type ActivityItem,
   parseProfileTab,
   type ProfileTab,
   type EarningsSnapshot,
@@ -42,6 +44,7 @@ export default function Profile() {
   const [items, setItems] = useState<VaultItem[]>([]);
   const [invLoading, setInvLoading] = useState(false);
   const [toast, setToast] = useState("");
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
 
   const [unlockedBadges, setUnlockedBadges] = useState<Set<string>>(
     new Set(["verified-commander", "pawn-legend", "first-sale", "promoted-seller", "loyal-commander", "top-collector"])
@@ -96,11 +99,6 @@ export default function Profile() {
       shopRevenue: 0,
     };
   }, [vaultValueCents, unlockedCount, listingsActive, unlockedBadges]);
-
-  const activities = useMemo(
-    () => buildDemoActivity(displayItems.length, vaultValueCents),
-    [displayItems.length, vaultValueCents]
-  );
 
   const openWalletConnect = useCallback(() => {
     setWalletModalVisible(true);
@@ -169,6 +167,17 @@ export default function Profile() {
   useEffect(() => {
     if (wallet.connected && wallet.publicKey) loadInventory();
   }, [wallet.connected, wallet.publicKey]);
+
+  useEffect(() => {
+    const demo = buildDemoActivity(displayItems.length, vaultValueCents);
+    if (!wallet.publicKey) {
+      setActivities(demo);
+      return;
+    }
+    fetchActivity(wallet.publicKey.toBase58())
+      .then((events) => setActivities(events.length > 0 ? events : demo))
+      .catch(() => setActivities(demo));
+  }, [wallet.publicKey, displayItems.length, vaultValueCents]);
 
   function showToast(msg: string, ms = 2400) {
     setToast(msg);

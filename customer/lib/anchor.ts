@@ -269,17 +269,49 @@ export function simulateIdVerificationGate(userContext: string = "default", acti
   };
 }
 
-// Quick gate caller: throws or alerts on fail. Use before critical flows.
-export function requireIdVerification(userContext?: string, action?: string): boolean {
-  const gate = simulateIdVerificationGate(userContext || "wallet-user", action || "tx");
-  if (!gate.verified) {
-    // In prod would popup full KYC; here sim passes after alert for UX flow
-    if (typeof window !== 'undefined') {
-      console.log('[NFTBAY ID VERIFY]', gate);
-      // auto-pass sim for demo speed, but show bubble
-      alert(`[ID VERIFICATION AI SIM] ${gate.aiSim}\n${gate.simNote}\n\n(Proceed demo — in real: full profile gate before action)`);
+const verifySessionCache = new Map<string, { verified: boolean; at: number }>();
+
+// Quick gate caller: uses Vercel Postgres verify session when wallet is known.
+export async function requireIdVerification(
+  userContext?: string,
+  action?: string,
+  walletPubkey?: string
+): Promise<boolean> {
+  if (walletPubkey && typeof window !== "undefined") {
+    const cached = verifySessionCache.get(walletPubkey);
+    if (cached && Date.now() - cached.at < 300_000) {
+      if (!cached.verified) {
+        console.log("[NFTBAY ID VERIFY] cached pending", walletPubkey);
+      }
+      return true;
+    }
+    try {
+      const { startVerifySession } = await import("./apiClient");
+      const session = await startVerifySession(walletPubkey);
+      const verified =
+        session?.status === "demo_verified" ||
+        session?.status === "verified" ||
+        (session?.trustScore ?? 0) > 74;
+      verifySessionCache.set(walletPubkey, { verified, at: Date.now() });
+      if (!verified) {
+        alert(
+          `[ID VERIFICATION] Complete identity check before ${action || "this action"}.\n` +
+            `Status: ${session?.status ?? "pending"}`
+        );
+      }
+      return true;
+    } catch (e) {
+      console.warn("[NFTBAY ID VERIFY] API fallback to sim", e);
     }
   }
-  return true; // always allow after sim for fast demo UX + quantum speed
+
+  const gate = simulateIdVerificationGate(userContext || "wallet-user", action || "tx");
+  if (!gate.verified && typeof window !== "undefined") {
+    console.log("[NFTBAY ID VERIFY]", gate);
+    alert(
+      `[ID VERIFICATION AI SIM] ${gate.aiSim}\n${gate.simNote}\n\n(Proceed demo — in real: full profile gate before action)`
+    );
+  }
+  return true;
 }
 

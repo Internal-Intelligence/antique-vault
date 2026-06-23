@@ -12,7 +12,8 @@ import {
 import { useAuctionBid } from "../hooks/useAuctionBid";
 import { requireIdVerification } from "../lib/anchor";
 import { isIncentiveBidder, showIncentiveBadge } from "../lib/incentiveBot";
-import { loadMarketplaceItems, type MarketplaceItem } from "../lib/nftbay";
+import { fetchListings } from "../lib/apiClient";
+import type { MarketplaceItem } from "../lib/nftbay";
 
 type Tab = "live" | "ending" | "bids" | "won";
 
@@ -29,7 +30,7 @@ export default function AuctionsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const rows = await loadMarketplaceItems(connection);
+      const { items: rows } = await fetchListings(false, connection);
       setItems(rows.filter((i) => i.listingType === 1 || i.claimStatus === 1));
     } finally {
       setLoading(false);
@@ -81,7 +82,7 @@ export default function AuctionsPage() {
   }, [auctions, items, tab, walletPk, now]);
 
   async function handleBid(item: MarketplaceItem, bidLamports: number) {
-    requireIdVerification("auctions-bid-" + item.itemId, "place-bid");
+    await requireIdVerification("auctions-bid-" + item.itemId, "place-bid", wallet.publicKey?.toBase58());
     if (!item.listingPda) return;
     try {
       await placeBid({

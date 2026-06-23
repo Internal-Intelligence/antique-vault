@@ -79,7 +79,11 @@ export default function ListItemModal({
 
   async function handleList() {
     if (!wallet.publicKey) return;
-    requireIdVerification("list-" + item.itemId, listingMode === "auction" ? "auction-list" : "secondary-list");
+    await requireIdVerification(
+      "list-" + item.itemId,
+      listingMode === "auction" ? "auction-list" : "secondary-list",
+      wallet.publicKey.toBase58()
+    );
     setSubmitting(true);
     setListingStatus("Preparing listing…");
     try {

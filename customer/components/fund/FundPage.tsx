@@ -77,7 +77,7 @@ export default function FundPage() {
     setErrors((p) => ({ ...p, [round.roundId]: "" }));
     setBuyingId(round.roundId);
     try {
-      requireIdVerification(`fund-round-${round.roundId}`, "buy-acq");
+      await requireIdVerification(`fund-round-${round.roundId}`, "buy-acq", wallet.publicKey.toBase58());
       const sig = await buyRoundUnits(wallet, connection, round, count);
       setToast(`Units purchased · ${sig.slice(0, 8)}…`);
       setTimeout(() => setToast(""), 4000);
